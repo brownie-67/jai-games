@@ -8,7 +8,7 @@ async function loadConfig() {
 loadConfig().then(config => {
   const { gravity, jumpForce, canvasWidth, canvasHeight } = config.settings;
   const W = canvasWidth, H = canvasHeight;
-  const PLAYER_SPEED = 2.5;   // slower, more controlled movement
+  const PLAYER_SPEED = 5.0;   // 2x speed
   const TOTAL_LEVELS  = 5;
 
   // ── Canvas ──

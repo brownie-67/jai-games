@@ -500,25 +500,55 @@ loadConfig().then(config => {
   document.addEventListener('keyup',   e => { keys[e.key] = false; });
 
   // ─────────────────────────────────────────────────────────────────
-  //  Input — touch buttons
+  //  Input — gesture zone (swipe left/right to move, flick up to jump)
   // ─────────────────────────────────────────────────────────────────
-  function bindTouchBtn(id, keyName) {
-    const btn = document.getElementById(id);
-    if (!btn) return;
-    const press   = e => { e.preventDefault(); keys[keyName] = true;  btn.classList.add('pressed');    };
-    const release = e => { e.preventDefault(); keys[keyName] = false; btn.classList.remove('pressed'); };
-    btn.addEventListener('touchstart',  press,   { passive: false });
-    btn.addEventListener('touchend',    release, { passive: false });
-    btn.addEventListener('touchcancel', release, { passive: false });
-    // Also work with mouse so desktop can test by clicking
-    btn.addEventListener('mousedown',  press);
-    btn.addEventListener('mouseup',    release);
-    btn.addEventListener('mouseleave', release);
-  }
+  const gestureZone = document.getElementById('gesture-zone');
+  if (gestureZone) {
+    let startX = 0, prevY = 0;
+    let jumpFired = false;
+    const MOVE_THRESHOLD = 18;   // px horizontal drift to start moving
+    const FLICK_VELOCITY = 9;    // px/frame upward speed to trigger jump
 
-  bindTouchBtn('btn-left',  'ArrowLeft');
-  bindTouchBtn('btn-right', 'ArrowRight');
-  bindTouchBtn('btn-jump',  'ArrowUp');
+    gestureZone.addEventListener('touchstart', e => {
+      e.preventDefault();
+      const t = e.touches[0];
+      startX = t.clientX;
+      prevY = t.clientY;
+      jumpFired = false;
+      gestureZone.classList.add('active');
+    }, { passive: false });
+
+    gestureZone.addEventListener('touchmove', e => {
+      e.preventDefault();
+      const t   = e.touches[0];
+      const dx  = t.clientX - startX;
+      const velY = t.clientY - prevY;   // negative = finger moving up
+
+      // Left / right
+      keys['ArrowLeft']  = dx < -MOVE_THRESHOLD;
+      keys['ArrowRight'] = dx >  MOVE_THRESHOLD;
+
+      // Upward flick → jump (fire once per gesture)
+      if (velY < -FLICK_VELOCITY && !jumpFired) {
+        keys['ArrowUp'] = true;
+        jumpFired = true;
+        setTimeout(() => { keys['ArrowUp'] = false; }, 120);
+      }
+
+      prevY = t.clientY;
+    }, { passive: false });
+
+    const endGesture = e => {
+      e.preventDefault();
+      keys['ArrowLeft']  = false;
+      keys['ArrowRight'] = false;
+      keys['ArrowUp']    = false;
+      jumpFired = false;
+      gestureZone.classList.remove('active');
+    };
+    gestureZone.addEventListener('touchend',    endGesture, { passive: false });
+    gestureZone.addEventListener('touchcancel', endGesture, { passive: false });
+  }
 
   overlayBtn.addEventListener('click', startGame);
 

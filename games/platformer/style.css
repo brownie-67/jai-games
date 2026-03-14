@@ -124,57 +124,35 @@ body {
   .keyboard-hint { display: none; }
 }
 
-/* ─── Touch controls ─── */
-.touch-controls {
-  display: none;  /* hidden on desktop */
+/* ─── Gesture zone (mobile) ─── */
+#gesture-zone {
+  display: none;
   width: min(800px, calc(100vw - 32px));
-  justify-content: space-between;
-  align-items: center;
-  padding: 8px 4px;
-}
-
-/* Show only on touch devices */
-@media (pointer: coarse) {
-  .touch-controls { display: flex; }
-}
-
-.touch-move {
-  display: flex;
-  gap: 14px;
-}
-
-.touch-btn {
-  width: 72px;
-  height: 72px;
-  border-radius: 50%;
-  background: rgba(108, 99, 255, 0.25);
-  border: 2px solid rgba(108, 99, 255, 0.55);
-  color: #fff;
-  font-size: 1.7rem;
-  display: flex;
+  height: 110px;
+  border-radius: 12px;
+  border: 2px dashed rgba(108, 99, 255, 0.3);
+  background: rgba(108, 99, 255, 0.07);
   align-items: center;
   justify-content: center;
-  cursor: pointer;
+  touch-action: none;
   user-select: none;
   -webkit-user-select: none;
-  touch-action: none;
+  cursor: pointer;
   transition: background 0.1s;
 }
 
-.touch-btn:active,
-.touch-btn.pressed {
-  background: rgba(108, 99, 255, 0.65);
+#gesture-zone.active {
+  background: rgba(108, 99, 255, 0.18);
+  border-color: rgba(108, 99, 255, 0.6);
 }
 
-.touch-jump {
-  width: 88px;
-  height: 88px;
-  font-size: 2rem;
-  background: rgba(255, 101, 132, 0.25);
-  border-color: rgba(255, 101, 132, 0.55);
+.gesture-hint {
+  color: #555577;
+  font-size: 0.8rem;
+  letter-spacing: 0.4px;
+  pointer-events: none;
 }
 
-.touch-jump:active,
-.touch-jump.pressed {
-  background: rgba(255, 101, 132, 0.65);
+@media (pointer: coarse) {
+  #gesture-zone { display: flex; }
 }

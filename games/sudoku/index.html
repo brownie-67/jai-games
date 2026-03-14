@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no" />
+  <title>Fruit Sudoku</title>
+  <link rel="stylesheet" href="../../shared/style.css" />
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+
+  <!-- ══════════════════════════════════════════════
+       Screen 1 — Mode selector
+  ══════════════════════════════════════════════ -->
+  <div id="screen-mode">
+
+    <header class="mode-header">
+      <a href="../../index.html" class="back-link">← Arcade</a>
+      <h1>🍎 Fruit Sudoku</h1>
+      <p>Fill every row, column and box with each fruit exactly once!</p>
+    </header>
+
+    <div class="mode-cards">
+
+      <!-- 6×6 card -->
+      <div class="mode-card">
+        <div class="card-icon">6×6</div>
+        <div class="card-label">Starter</div>
+        <p class="card-desc">6 fruits · 6×6 grid · great for beginners</p>
+        <div class="diff-btns">
+          <button class="diff-btn easy"   data-size="6" data-diff="easy">Easy</button>
+          <button class="diff-btn medium" data-size="6" data-diff="medium">Medium</button>
+          <button class="diff-btn hard"   data-size="6" data-diff="hard">Hard</button>
+        </div>
+      </div>
+
+      <!-- 9×9 card -->
+      <div class="mode-card">
+        <div class="card-icon">9×9</div>
+        <div class="card-label">Classic</div>
+        <p class="card-desc">9 fruits · full Sudoku grid · real challenge</p>
+        <div class="diff-btns">
+          <button class="diff-btn easy"   data-size="9" data-diff="easy">Easy</button>
+          <button class="diff-btn medium" data-size="9" data-diff="medium">Medium</button>
+          <button class="diff-btn hard"   data-size="9" data-diff="hard">Hard</button>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- ══════════════════════════════════════════════
+       Screen 2 — Game
+  ══════════════════════════════════════════════ -->
+  <div id="screen-game" class="hidden">
+
+    <!-- Top bar -->
+    <div class="topbar">
+      <button id="btn-back">← Back</button>
+      <h1 id="game-title">🍎 Fruit Sudoku</h1>
+      <span id="timer">00:00</span>
+    </div>
+
+    <!-- Status row -->
+    <div class="status-row">
+      <span id="info-mode"></span>
+      <span id="mistakes-display">❌ 0 / 5</span>
+      <button id="btn-new">New Game</button>
+    </div>
+
+    <!-- Board -->
+    <div id="board-wrap">
+      <div id="board"></div>
+    </div>
+
+    <!-- Fruit picker -->
+    <div id="fruit-picker"></div>
+
+    <!-- Action buttons -->
+    <div class="actions">
+      <button id="btn-erase" class="action-btn">⌫ Erase</button>
+    </div>
+
+  </div>
+
+  <!-- ══════════════════════════════════════════════
+       Win overlay
+  ══════════════════════════════════════════════ -->
+  <div id="win-overlay" class="hidden">
+    <div class="win-box">
+      <div class="win-emoji">🎉</div>
+      <h2>Puzzle Solved!</h2>
+      <p id="win-msg"></p>
+      <div class="win-btns">
+        <button id="win-again">Play Again</button>
+        <button id="win-home">Home</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Generating spinner -->
+  <div id="spinner" class="hidden">
+    <div class="spinner-box">
+      <div class="spin"></div>
+      <p>Generating puzzle…</p>
+    </div>
+  </div>
+
+  <script src="game.js"></script>
+</body>
+</html>

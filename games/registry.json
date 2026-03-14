@@ -6,5 +6,13 @@
     "description": "Jump and run across platforms! Collect all coins to win.",
     "emoji": "🎮",
     "color": "#6C63FF"
+  },
+  {
+    "id": "sudoku",
+    "path": "games/sudoku/",
+    "title": "Fruit Sudoku",
+    "description": "Fill every row, column and box with each fruit exactly once!",
+    "emoji": "🍎",
+    "color": "#22c55e"
   }
 ]

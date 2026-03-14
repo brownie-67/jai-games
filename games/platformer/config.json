@@ -1,0 +1,20 @@
+{
+  "id": "platformer",
+  "title": "Jai's Platformer",
+  "description": "Jump and run across platforms! Collect all coins to win.",
+  "emoji": "🎮",
+  "version": "1.0.0",
+  "author": "Jai",
+  "controls": {
+    "Move Left": "Arrow Left",
+    "Move Right": "Arrow Right",
+    "Jump": "Arrow Up  or  Space"
+  },
+  "settings": {
+    "gravity": 0.5,
+    "playerSpeed": 2.5,
+    "jumpForce": -12,
+    "canvasWidth": 800,
+    "canvasHeight": 450
+  }
+}

@@ -1,0 +1,110 @@
+/* ─── Platformer Game Page ─── */
+
+body {
+  background: #0f0f1a;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  min-height: 100vh;
+}
+
+/* ─── Top bar ─── */
+.topbar {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  padding: 12px 24px;
+  background: #1a1a2e;
+  border-bottom: 1px solid rgba(108, 99, 255, 0.2);
+  gap: 16px;
+}
+
+.topbar a {
+  color: #888aaa;
+  font-size: 0.9rem;
+  text-decoration: none;
+}
+
+.topbar a:hover { color: #e0e0f0; }
+
+.topbar h1 {
+  font-size: 1.1rem;
+  color: #e0e0f0;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+/* ─── Game wrapper ─── */
+.game-wrapper {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 24px 16px;
+  gap: 16px;
+}
+
+/* ─── HUD (score, lives) ─── */
+.hud {
+  display: flex;
+  gap: 32px;
+  font-size: 1rem;
+  color: #e0e0f0;
+  font-weight: 600;
+}
+
+.hud span { color: #6C63FF; }
+
+/* ─── Canvas ─── */
+#gameCanvas {
+  border-radius: 10px;
+  border: 2px solid rgba(108, 99, 255, 0.4);
+  display: block;
+  background: #1a1a2e;
+}
+
+/* ─── Message overlay (start / game over / win) ─── */
+#overlay {
+  position: absolute;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 14px;
+  color: #e0e0f0;
+  text-align: center;
+  pointer-events: none;
+}
+
+#overlay.hidden { display: none; }
+
+#overlay h2 {
+  font-size: 2rem;
+  text-shadow: 0 2px 12px rgba(108,99,255,0.6);
+}
+
+#overlay p {
+  color: #888aaa;
+  font-size: 1rem;
+}
+
+#overlay .btn {
+  pointer-events: all;
+  padding: 10px 28px;
+  background: #6C63FF;
+  border: none;
+  border-radius: 24px;
+  color: #fff;
+  font-size: 1rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+
+#overlay .btn:hover { background: #5a52e0; }
+
+/* ─── Controls hint ─── */
+.controls-hint {
+  color: #555577;
+  font-size: 0.78rem;
+  letter-spacing: 0.5px;
+}

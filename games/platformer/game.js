@@ -494,10 +494,32 @@ loadConfig().then(config => {
   }
 
   // ─────────────────────────────────────────────────────────────────
-  //  Input
+  //  Input — keyboard
   // ─────────────────────────────────────────────────────────────────
   document.addEventListener('keydown', e => { keys[e.key] = true;  });
   document.addEventListener('keyup',   e => { keys[e.key] = false; });
+
+  // ─────────────────────────────────────────────────────────────────
+  //  Input — touch buttons
+  // ─────────────────────────────────────────────────────────────────
+  function bindTouchBtn(id, keyName) {
+    const btn = document.getElementById(id);
+    if (!btn) return;
+    const press   = e => { e.preventDefault(); keys[keyName] = true;  btn.classList.add('pressed');    };
+    const release = e => { e.preventDefault(); keys[keyName] = false; btn.classList.remove('pressed'); };
+    btn.addEventListener('touchstart',  press,   { passive: false });
+    btn.addEventListener('touchend',    release, { passive: false });
+    btn.addEventListener('touchcancel', release, { passive: false });
+    // Also work with mouse so desktop can test by clicking
+    btn.addEventListener('mousedown',  press);
+    btn.addEventListener('mouseup',    release);
+    btn.addEventListener('mouseleave', release);
+  }
+
+  bindTouchBtn('btn-left',  'ArrowLeft');
+  bindTouchBtn('btn-right', 'ArrowRight');
+  bindTouchBtn('btn-jump',  'ArrowUp');
+
   overlayBtn.addEventListener('click', startGame);
 
   // ─────────────────────────────────────────────────────────────────

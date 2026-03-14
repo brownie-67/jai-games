@@ -26,7 +26,7 @@
     </div>
 
     <!-- Canvas + overlay wrapper -->
-    <div style="position: relative; display: inline-block;">
+    <div class="canvas-wrapper">
       <canvas id="gameCanvas"></canvas>
 
       <div id="overlay">
@@ -36,10 +36,19 @@
       </div>
     </div>
 
-    <!-- Controls hint -->
-    <p class="controls-hint">
+    <!-- Controls hint (keyboard) -->
+    <p class="controls-hint keyboard-hint">
       ← → Move &nbsp;|&nbsp; ↑ / Space Jump
     </p>
+
+    <!-- Touch controls (mobile) -->
+    <div class="touch-controls">
+      <div class="touch-move">
+        <button id="btn-left"  class="touch-btn">◀</button>
+        <button id="btn-right" class="touch-btn">▶</button>
+      </div>
+      <button id="btn-jump" class="touch-btn touch-jump">▲</button>
+    </div>
 
   </div>
 

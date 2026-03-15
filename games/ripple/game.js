@@ -1,567 +1,860 @@
 'use strict';
 
-// ── Story Data ────────────────────────────────────────────────────────────────
+// ═══════════════════════════════════════════════════════════════════
+// LEVELS & SCENARIOS
+// ═══════════════════════════════════════════════════════════════════
 
-const SCENES = [
-  // ── Scene 0: The Fallen Books ──────────────────────────────────────────────
+const LEVELS = [
   {
-    id: 'books',
-    bgClass: 'scene-hallway',
-    location: '🏫  School Hallway · First Day',
-    chars: [
-      { emoji: '👧🏻', label: 'Mia', xPct: 62, yPct: 30, id: 'mia' },
-      { emoji: '📚', label: '', xPct: 58, yPct: 65, id: 'books', size: '2.8rem' },
+    title: 'Home Base',
+    emoji: '🏠',
+    color: '#f97316',
+    timerSec: 12,
+    scenarios: [
+      {
+        text: 'Your little sibling wants the last slice of pizza. You\'re still hungry too.',
+        choices: [
+          { text: '🤝 Split it in half and share', type: 'good' },
+          { text: '🤷 Say you\'ll both find something else', type: 'okay' },
+          { text: '🍕 Eat it quickly before they ask', type: 'bad' },
+        ],
+      },
+      {
+        text: 'Mom asks you to clean your room — but your favorite show just started.',
+        choices: [
+          { text: '📺 Pause the show and clean first', type: 'good' },
+          { text: '⏸ Ask if you can do it right after one episode', type: 'okay' },
+          { text: '🙈 Pretend you didn\'t hear', type: 'bad' },
+        ],
+      },
+      {
+        text: 'Dad is struggling with heavy grocery bags. You\'re in the middle of a game.',
+        choices: [
+          { text: '🛍 Pause the game and run to help', type: 'good' },
+          { text: '📱 Finish your turn, then help', type: 'okay' },
+          { text: '🎮 Keep playing — he can manage fine', type: 'bad' },
+        ],
+      },
+      {
+        text: 'Your sibling accidentally broke your favorite toy. They look terrified.',
+        choices: [
+          { text: '😊 "It\'s okay — accidents happen."', type: 'good' },
+          { text: '😤 Get upset but don\'t say anything mean', type: 'okay' },
+          { text: '😡 Yell at them and tell your parents immediately', type: 'bad' },
+        ],
+      },
+      {
+        text: 'It\'s your turn to do the dishes. You\'re exhausted after a long day at school.',
+        choices: [
+          { text: '🍽 Do them anyway without complaining', type: 'good' },
+          { text: '😓 Do them while complaining loudly', type: 'okay' },
+          { text: '🛑 Leave them and say you\'ll do it tomorrow', type: 'bad' },
+        ],
+      },
+      {
+        text: 'Mom had a really hard day at work. She walks in looking drained.',
+        choices: [
+          { text: '💝 Offer to make her tea and give her a hug', type: 'good' },
+          { text: '🤫 Leave her alone quietly to rest', type: 'okay' },
+          { text: '📺 Ask her to make dinner like normal', type: 'bad' },
+        ],
+      },
+      {
+        text: 'Your sibling got a noticeably bigger piece of cake than you at dessert.',
+        choices: [
+          { text: '😊 Let it go — it\'s just cake', type: 'good' },
+          { text: '💬 Quietly point it out to an adult', type: 'okay' },
+          { text: '😠 Make a big scene about it being unfair', type: 'bad' },
+        ],
+      },
+      {
+        text: 'You spilled juice on the carpet while no one was watching.',
+        choices: [
+          { text: '🧽 Clean it up and tell your parent what happened', type: 'good' },
+          { text: '🧹 Clean it up but don\'t mention it', type: 'okay' },
+          { text: '🏃 Cover it with the rug and hope no one notices', type: 'bad' },
+        ],
+      },
     ],
-    dialog: [
-      { speaker: null, text: 'The hallway is loud and crowded. Today is the very first day of school.' },
-      { speaker: null, text: 'Suddenly — CRASH. A girl trips and her backpack spills open. Books and papers scatter everywhere!' },
-      { speaker: 'Mia', charId: 'mia', text: '"Oh no, oh no..." She scrambles to collect everything, face turning red.' },
-      { speaker: null, text: 'Everyone else keeps walking. She glances up and notices you watching.' },
-    ],
-    choicePrompt: 'What do you do?',
-    choices: [
-      { text: '🤝  Stop and help her pick everything up', karma: 2, tag: 'helped_mia', key: 'kind' },
-      { text: '🚶  Keep walking — you\'ll be late to class', karma: 0, tag: null, key: 'neutral' },
-      { text: '😂  Nudge your friend and laugh at her', karma: -2, tag: 'hurt_mia', key: 'unkind' },
-    ],
-    reactions: {
-      kind: [
-        { speaker: 'Mia', charId: 'mia', text: '"Thank you SO much! I was so nervous today. I\'m Mia!"' },
-        { speaker: null, text: 'Her whole face lights up. You made a new friend on the very first day.' },
-      ],
-      neutral: [
-        { speaker: null, text: 'She picks up her books alone, glancing around hopefully.' },
-        { speaker: null, text: 'She manages. But the hallway felt very big and empty today.' },
-      ],
-      unkind: [
-        { speaker: 'Mia', charId: 'mia', text: '"..." Her cheeks go red. She stares at the floor and doesn\'t say a word.' },
-        { speaker: null, text: 'The laughter rings in her ears all morning. You forgot. She didn\'t.' },
-      ],
-    },
   },
 
-  // ── Scene 1: The Empty Table ───────────────────────────────────────────────
   {
-    id: 'table',
-    bgClass: 'scene-cafeteria',
-    location: '🍽️  School Cafeteria · Lunchtime',
-    chars: [
-      { emoji: '🧒🏽', label: 'Sam', xPct: 50, yPct: 28, id: 'sam' },
-      { emoji: '🥪', label: '', xPct: 50, yPct: 65, id: 'lunch', size: '2rem' },
+    title: 'School Zone',
+    emoji: '🏫',
+    color: '#3b82f6',
+    timerSec: 11,
+    scenarios: [
+      {
+        text: 'Your classmate is totally stuck on the problem you just solved.',
+        choices: [
+          { text: '📖 Explain your steps clearly', type: 'good' },
+          { text: '💡 Give a small hint without the answer', type: 'okay' },
+          { text: '🙅 You worked hard — they can figure it out', type: 'bad' },
+        ],
+      },
+      {
+        text: 'You bumped into someone\'s lunch tray by accident. Their food spills.',
+        choices: [
+          { text: '🙏 Apologize and help clean it up right away', type: 'good' },
+          { text: '😬 Say sorry and quickly walk away', type: 'okay' },
+          { text: '🚶 Keep walking — they didn\'t see it was you', type: 'bad' },
+        ],
+      },
+      {
+        text: 'The teacher asks who didn\'t finish their homework. You didn\'t.',
+        choices: [
+          { text: '✋ Raise your hand and admit it honestly', type: 'good' },
+          { text: '😶 Stay very quiet and hope she doesn\'t call on you', type: 'okay' },
+          { text: '📋 Quickly copy from a friend\'s worksheet', type: 'bad' },
+        ],
+      },
+      {
+        text: 'You find a $10 bill on the floor in the hallway.',
+        choices: [
+          { text: '🏫 Turn it in to the front office', type: 'good' },
+          { text: '👀 Leave it — someone else will handle it', type: 'okay' },
+          { text: '💰 Pocket it — finders keepers', type: 'bad' },
+        ],
+      },
+      {
+        text: 'Your teammate is clearly very nervous before your class presentation.',
+        choices: [
+          { text: '😊 Give them a calm smile and a thumbs up', type: 'good' },
+          { text: '👏 Let them handle it — they\'ll be fine', type: 'okay' },
+          { text: '🙄 Wish they\'d pull it together so you don\'t look bad', type: 'bad' },
+        ],
+      },
+      {
+        text: 'A kid in your class is being teased by a group of others.',
+        choices: [
+          { text: '🛑 Speak up clearly: "Hey, stop that."', type: 'good' },
+          { text: '📣 Go find the teacher immediately', type: 'okay' },
+          { text: '😶 Look away and stay completely out of it', type: 'bad' },
+        ],
+      },
+      {
+        text: 'You scored much higher on the test than your best friend. They\'re upset.',
+        choices: [
+          { text: '🤗 Don\'t brag — offer to study together next time', type: 'good' },
+          { text: '🤐 Just stay quiet about your score', type: 'okay' },
+          { text: '🏆 Tell everyone else your score', type: 'bad' },
+        ],
+      },
+      {
+        text: 'Your group project partner has done zero work. Deadline is tomorrow.',
+        choices: [
+          { text: '💬 Calmly talk to them about splitting it fairly', type: 'good' },
+          { text: '📝 Do their part too so the project doesn\'t fail', type: 'okay' },
+          { text: '😤 Go straight to the teacher to get them in trouble', type: 'bad' },
+        ],
+      },
     ],
-    dialog: [
-      { speaker: null, text: 'Lunchtime. The cafeteria is noisy and full of laughter.' },
-      { speaker: null, text: 'In the far corner, a boy named Sam sits completely alone. He\'s been eating alone every single day.' },
-      { speaker: 'Sam', charId: 'sam', text: 'He looks up for a second, then quickly back down at his sandwich.' },
-      { speaker: null, text: 'Your table has an empty seat. Your friends are joking around and haven\'t noticed Sam.' },
-    ],
-    choicePrompt: 'What do you do?',
-    choices: [
-      { text: '😊  Walk over and invite Sam to sit with you', karma: 2, tag: 'included_sam', key: 'kind' },
-      { text: '🤷  Stay with your friends — it\'s not really your problem', karma: 0, tag: null, key: 'neutral' },
-      { text: '😒  Join your friends who are quietly making fun of him', karma: -2, tag: 'excluded_sam', key: 'unkind' },
-    ],
-    reactions: {
-      kind: [
-        { speaker: 'Sam', charId: 'sam', text: '"...Really? You sure?" He can barely believe it.' },
-        { speaker: null, text: 'Sam sits with you. He\'s actually really funny. You wonder why you didn\'t do this sooner.' },
-      ],
-      neutral: [
-        { speaker: null, text: 'Sam finishes his lunch alone. Another hour where no one noticed.' },
-        { speaker: null, text: 'You\'re laughing with your friends. Sam counts the minutes until the bell rings.' },
-      ],
-      unkind: [
-        { speaker: 'Sam', charId: 'sam', text: 'He hears the snickering. He stops eating and stares at his tray.' },
-        { speaker: null, text: 'Sam throws away most of his lunch. He wasn\'t very hungry anyway.' },
-      ],
-    },
   },
 
-  // ── Scene 2: The Rumor ─────────────────────────────────────────────────────
   {
-    id: 'rumor',
-    bgClass: 'scene-yard',
-    location: '🏃  School Yard · After Lunch',
-    chars: [
-      { emoji: '👦🏼', label: 'Riley', xPct: 60, yPct: 28, id: 'riley' },
-      { emoji: '📱', label: '', xPct: 30, yPct: 60, id: 'phone', size: '2.4rem' },
+    title: 'Friend World',
+    emoji: '👫',
+    color: '#ec4899',
+    timerSec: 10,
+    scenarios: [
+      {
+        text: 'Your friends are playing a game and refuse to let the new kid join.',
+        choices: [
+          { text: '🤝 "Come on — the more the merrier!"', type: 'good' },
+          { text: '🤷 Walk away — it\'s not your game to decide', type: 'okay' },
+          { text: '😏 Agree with them — more players complicates things', type: 'bad' },
+        ],
+      },
+      {
+        text: 'Your best friend tells you a secret that sounds like they might be in danger.',
+        choices: [
+          { text: '💬 Tell a trusted adult, even though it breaks the secret', type: 'good' },
+          { text: '🤝 Promise to help them handle it yourself', type: 'okay' },
+          { text: '🤐 Keep the secret — you promised', type: 'bad' },
+        ],
+      },
+      {
+        text: 'You accidentally broke something at a friend\'s house.',
+        choices: [
+          { text: '🙏 Tell your friend and their parent what happened', type: 'good' },
+          { text: '😬 Tell your friend privately but not their parent', type: 'okay' },
+          { text: '🏃 Hide it before anyone notices', type: 'bad' },
+        ],
+      },
+      {
+        text: 'Your friend has been quiet and sad for several days.',
+        choices: [
+          { text: '💜 Find a quiet moment to ask: "Are you okay?"', type: 'good' },
+          { text: '😐 Give them space — maybe they just need time', type: 'okay' },
+          { text: '🙈 Ignore it — you don\'t want an awkward conversation', type: 'bad' },
+        ],
+      },
+      {
+        text: 'All your friends start teasing someone. They look to you to join in.',
+        choices: [
+          { text: '🛑 Stay quiet and don\'t join — even if it\'s awkward', type: 'good' },
+          { text: '😶 Laugh a little so you fit in but add nothing cruel', type: 'okay' },
+          { text: '😂 Join in — you don\'t want to be the odd one out', type: 'bad' },
+        ],
+      },
+      {
+        text: 'You promised to help your friend move. Then a fun party invitation arrives.',
+        choices: [
+          { text: '🤝 Keep your promise and help with the move', type: 'good' },
+          { text: '💬 Explain the situation and ask if another day works', type: 'okay' },
+          { text: '🎉 Go to the party — your friend will understand', type: 'bad' },
+        ],
+      },
+      {
+        text: 'Your friend tells you something untrue about another person you both know.',
+        choices: [
+          { text: '💬 Gently say "I don\'t think that\'s true — let\'s not spread it."', type: 'good' },
+          { text: '🤔 Nod along but don\'t repeat it to anyone', type: 'okay' },
+          { text: '📱 Share it with just one other person', type: 'bad' },
+        ],
+      },
+      {
+        text: 'Someone new sits at your lunch table without being invited.',
+        choices: [
+          { text: '😊 Smile and introduce yourself', type: 'good' },
+          { text: '😐 Say nothing and keep eating normally', type: 'okay' },
+          { text: '😒 Tell them this table is already taken', type: 'bad' },
+        ],
+      },
     ],
-    dialog: [
-      { speaker: null, text: 'A rumor is spreading — something mean and totally untrue about Riley.' },
-      { speaker: null, text: 'You know it\'s not true. You can see the messages piling up in the group chat.' },
-      { speaker: 'Friend', charId: null, text: '"Did you see what everyone\'s saying about Riley? Wild, right?" Your friend holds up their phone.' },
-      { speaker: null, text: 'Riley is just across the yard. He hasn\'t seen it yet. You have a choice to make right now.' },
-    ],
-    choicePrompt: 'What do you do?',
-    choices: [
-      { text: '✋  Speak up: "That\'s not true. Everyone needs to stop."', karma: 2, tag: 'defended_riley', key: 'kind' },
-      { text: '😶  Stay quiet — you don\'t want to get involved', karma: -1, tag: null, key: 'neutral' },
-      { text: '📲  Share it — everyone else already has', karma: -2, tag: 'spread_rumor', key: 'unkind' },
-    ],
-    reactions: {
-      kind: [
-        { speaker: 'Riley', charId: 'riley', text: '"You stopped it? I... honestly, thank you. You didn\'t have to do that."' },
-        { speaker: null, text: 'The rumor slows down. It took real courage to say something. Riley won\'t forget it.' },
-      ],
-      neutral: [
-        { speaker: null, text: 'The rumor spreads all afternoon. Riley finds out by end of the day.' },
-        { speaker: 'Riley', charId: 'riley', text: '"Nobody said anything?" He stares at his phone, looking lost.' },
-      ],
-      unkind: [
-        { speaker: null, text: 'You share it. It spreads everywhere. Riley finds out you were part of it.' },
-        { speaker: 'Riley', charId: 'riley', text: '"I thought you were different." He doesn\'t talk to you for a week.' },
-      ],
-    },
   },
 
-  // ── Scene 3: The Kitten in the Rain ───────────────────────────────────────
   {
-    id: 'rain',
-    bgClass: 'scene-rain',
-    rain: true,
-    location: '🌧️  Street Corner · Rainy Afternoon',
-    chars: [
-      { emoji: '🐱', label: '', xPct: 38, yPct: 25, id: 'cat' },
-      { emoji: '👵🏼', label: 'Mrs. Chen', xPct: 65, yPct: 35, id: 'chen' },
+    title: 'Community',
+    emoji: '🌍',
+    color: '#22c55e',
+    timerSec: 9,
+    scenarios: [
+      {
+        text: 'You see someone drop their wallet outside a shop.',
+        choices: [
+          { text: '🏃 Run after them and return it immediately', type: 'good' },
+          { text: '👀 Pick it up and look around for the owner', type: 'okay' },
+          { text: '💸 Open it — there\'s $20 inside. Pocket it.', type: 'bad' },
+        ],
+      },
+      {
+        text: 'There\'s trash right next to a bin — but not quite inside it.',
+        choices: [
+          { text: '♻️ Pick it up and put it in properly', type: 'good' },
+          { text: '🤷 Walk past — you didn\'t drop it', type: 'okay' },
+          { text: '🦶 Kick it further away so it\'s out of your path', type: 'bad' },
+        ],
+      },
+      {
+        text: 'An elderly person is struggling to reach something on a high shelf in a store.',
+        choices: [
+          { text: '🙋 Walk over and help them get it', type: 'good' },
+          { text: '👀 Point it out to a nearby store worker', type: 'okay' },
+          { text: '🚶 Keep walking — someone else will help', type: 'bad' },
+        ],
+      },
+      {
+        text: 'A younger kid has fallen off their bike and is crying on the path.',
+        choices: [
+          { text: '🩹 Go over and make sure they\'re okay', type: 'good' },
+          { text: '👀 Look for a nearby adult to help them', type: 'okay' },
+          { text: '🎧 You have headphones in — pretend you didn\'t see', type: 'bad' },
+        ],
+      },
+      {
+        text: 'Someone is sitting alone at the park, crying quietly.',
+        choices: [
+          { text: '💬 Gently ask: "Are you okay? Do you need help?"', type: 'good' },
+          { text: '👀 Look for a parent or adult nearby for them', type: 'okay' },
+          { text: '🎮 It\'s probably nothing — go back to what you were doing', type: 'bad' },
+        ],
+      },
+      {
+        text: 'A stray dog is loose in the neighborhood, looking lost and scared.',
+        choices: [
+          { text: '📞 Stay with it and try to find its owner or get help', type: 'good' },
+          { text: '🐕 Walk around it carefully', type: 'okay' },
+          { text: '🏃 Keep walking fast — it might bite', type: 'bad' },
+        ],
+      },
+      {
+        text: 'Someone\'s flowers in the community garden are being accidentally stepped on.',
+        choices: [
+          { text: '🗣 Politely point it out so they can step aside', type: 'good' },
+          { text: '🌸 Step carefully around it yourself but say nothing', type: 'okay' },
+          { text: '🚶 Not your concern — you\'re just passing through', type: 'bad' },
+        ],
+      },
+      {
+        text: 'At a party, a huge amount of perfectly good food is about to be thrown away.',
+        choices: [
+          { text: '💡 Suggest putting the extras in bags for people to take home', type: 'good' },
+          { text: '🤷 Mention it to an adult and let them decide', type: 'okay' },
+          { text: '🎂 Grab extra for yourself and let the rest go in the bin', type: 'bad' },
+        ],
+      },
     ],
-    dialog: [
-      { speaker: null, text: 'It\'s pouring rain and you\'re rushing home.' },
-      { speaker: null, text: 'You hear a tiny cry — a kitten is stuck behind a fence, soaked and shivering.' },
-      { speaker: 'Mrs. Chen', charId: 'chen', text: '"Oh dear! I\'ve been trying to reach her for an hour. My hands just can\'t do it anymore..."' },
-      { speaker: null, text: 'You\'d have to reach through the gap — you\'d absolutely get drenched. But the kitten looks terrified.' },
+  },
+
+  {
+    title: 'Hard Choices',
+    emoji: '💪',
+    color: '#a855f7',
+    timerSec: 8,
+    scenarios: [
+      {
+        text: 'Everyone laughs at a classmate\'s embarrassing moment. They look to you.',
+        choices: [
+          { text: '🛑 Don\'t laugh. Give the classmate a kind look.', type: 'good' },
+          { text: '😐 Stay very quiet. Don\'t laugh, don\'t speak up.', type: 'okay' },
+          { text: '😂 Laugh along — you don\'t want to seem different', type: 'bad' },
+        ],
+      },
+      {
+        text: 'You know a rumor spreading around school is completely false.',
+        choices: [
+          { text: '✋ Speak up and tell people it\'s not true', type: 'good' },
+          { text: '🤐 Don\'t repeat it but also don\'t correct it', type: 'okay' },
+          { text: '📲 Add your own detail before passing it on', type: 'bad' },
+        ],
+      },
+      {
+        text: 'Your friend is pressuring you to skip class and hang out instead.',
+        choices: [
+          { text: '🏫 Say no — you can hang out right after school', type: 'good' },
+          { text: '😬 Say you\'ll think about it just to avoid the argument', type: 'okay' },
+          { text: '🎒 Skip it — one class won\'t matter', type: 'bad' },
+        ],
+      },
+      {
+        text: 'Someone is being bullied. No adults are nearby. Everyone is watching.',
+        choices: [
+          { text: '🛑 Step in clearly: "Hey. Stop. That\'s not okay."', type: 'good' },
+          { text: '📱 Go get an adult as fast as you can', type: 'okay' },
+          { text: '🏃 Walk away — you don\'t want to become a target too', type: 'bad' },
+        ],
+      },
+      {
+        text: 'You could easily copy from the person next to you on a test. You\'re not prepared.',
+        choices: [
+          { text: '✏️ Do your honest best — a real grade is yours to own', type: 'good' },
+          { text: '😬 Peek once but try to mostly do your own work', type: 'okay' },
+          { text: '👀 Copy it — this grade matters too much', type: 'bad' },
+        ],
+      },
+      {
+        text: 'Your close friend shoplifts something small and tells you to stay quiet.',
+        choices: [
+          { text: '💬 Tell them it\'s wrong and encourage them to return it', type: 'good' },
+          { text: '😶 Say nothing but feel very uncomfortable about it', type: 'okay' },
+          { text: '🤝 Stay quiet — you don\'t want to lose the friendship', type: 'bad' },
+        ],
+      },
+      {
+        text: 'Someone posts something cruel about your classmate online.',
+        choices: [
+          { text: '📵 Report the post and check in on your classmate', type: 'good' },
+          { text: '😶 Don\'t like or share it — just scroll past', type: 'okay' },
+          { text: '😂 React with a laugh — it is kind of funny', type: 'bad' },
+        ],
+      },
+      {
+        text: 'You said something that hurt your friend\'s feelings. They don\'t know it was you.',
+        choices: [
+          { text: '💬 Find the courage to apologize and be honest', type: 'good' },
+          { text: '😬 Act extra kind to them to silently make up for it', type: 'okay' },
+          { text: '🙈 Say nothing — they\'ll get over it eventually', type: 'bad' },
+        ],
+      },
     ],
-    choicePrompt: 'What do you do?',
-    choices: [
-      { text: '🌧️  Get wet and gently free the kitten', karma: 2, tag: 'helped_chen', key: 'kind' },
-      { text: '🏃  Say you\'ll get someone to help... and keep walking', karma: -1, tag: null, key: 'neutral' },
-      { text: '🙅  You\'ll ruin your jacket. Not your problem.', karma: -2, tag: null, key: 'unkind' },
-    ],
-    reactions: {
-      kind: [
-        { speaker: 'Mrs. Chen', charId: 'chen', text: '"Oh, bless you! Here — please take my umbrella. You\'ll need it far more than I do!"' },
-        { speaker: null, text: 'The kitten purrs in Mrs. Chen\'s arms. You walk home soaked but somehow very warm inside.' },
-      ],
-      neutral: [
-        { speaker: null, text: 'You don\'t come back. The kitten is freed much later, still shivering.' },
-        { speaker: null, text: 'It was easier not to think about it. But you thought about it the whole walk home.' },
-      ],
-      unkind: [
-        { speaker: null, text: 'You leave. Behind you, the kitten\'s small cry fades in the rain.' },
-        { speaker: null, text: 'You stayed dry. But somehow the walk home doesn\'t feel very warm.' },
-      ],
-    },
   },
 ];
 
-// ── Epilogue Callbacks ─────────────────────────────────────────────────────
+// ═══════════════════════════════════════════════════════════════════
+// CONSTANTS
+// ═══════════════════════════════════════════════════════════════════
 
-const CALLBACKS = {
-  helped_mia: {
-    emoji: '👧🏻',
-    text: '<strong>Mia</strong> saw you drop your things in the hallway. Without hesitating, she rushed over to help — just like you helped her on that first day.',
-  },
-  included_sam: {
-    emoji: '🧒🏽',
-    text: '<strong>Sam</strong> saved you a seat at lunch when you couldn\'t find your friends. He even shared his snacks. "You were the first person who was ever nice to me," he said.',
-  },
-  defended_riley: {
-    emoji: '👦🏼',
-    text: '<strong>Riley</strong> heard someone starting a rumor about YOU. He stood up immediately: "That\'s not true. Stop spreading it." He didn\'t even hesitate.',
-  },
-  helped_chen: {
-    emoji: '👵🏼',
-    text: '<strong>Mrs. Chen</strong> spotted you caught in the rain without an umbrella. She walked over and insisted you take hers. "Kindness finds its way back," she smiled.',
-  },
+const SAVE_KEY   = 'kindcoins_v1';
+const COINS_GOOD_FAST = 15;
+const COINS_GOOD      = 10;
+const COINS_OKAY      =  3;
+const COINS_BAD       = -5;
+const COINS_TIMEOUT   = -3;
+const STREAK_BONUS    = 20;
+const STREAK_AT       = 3;
+
+const FEEDBACK_MSGS = {
+  good:    ['Great choice! 💚', 'That\'s real kindness! ✨', 'Well done! 🌟', 'You showed real heart! 💛', 'That\'s the one! 🎯'],
+  okay:    ['Not bad... but there was a kinder way.', 'Safe choice — kindness goes a little further.', 'You could have done a bit more.'],
+  bad:     ['Think about how that felt for them.', 'That one made things harder for someone.', 'We all stumble — try again!'],
+  timeout: ['Too slow! Trust your instincts next time.', 'Time\'s up! Stay focused!', 'Quick — kindness can\'t wait!'],
 };
 
-// ── Endings ────────────────────────────────────────────────────────────────
+// ═══════════════════════════════════════════════════════════════════
+// STATE
+// ═══════════════════════════════════════════════════════════════════
 
-const ENDINGS = {
-  warm: {
-    emoji: '🌟',
-    title: 'The Warm Ripple',
-    message: 'The kindness you sent into the world came back to you.\n\nThe people you helped remembered — and they showed up.\n\nThat\'s the power of ripples. They travel farther than you think. They reach people you\'ve long forgotten. And one day, they find their way home.',
-  },
-  mixed: {
-    emoji: '🌊',
-    title: 'Still Growing',
-    message: 'Some of your ripples were warm — and they found their way back.\nOthers faded in the cold.\n\nThat\'s okay. No one is perfect. Every single day is a new chance to choose.\n\nWhat kind of ripples will you make tomorrow?',
-  },
-  cold: {
-    emoji: '❄️',
-    title: 'The Cold Ripple',
-    message: 'When you needed someone... the world felt quiet.\n\nNot because people are unkind. But because the ripples we put out shape the world around us.\n\nThe best part? Every single moment is a fresh start. Tomorrow, you can choose differently.',
-  },
-};
+let save    = {};   // persisted
+let session = {};   // in-memory only
 
-// ── State ─────────────────────────────────────────────────────────────────────
+// ═══════════════════════════════════════════════════════════════════
+// PERSISTENCE
+// ═══════════════════════════════════════════════════════════════════
 
-let sceneIndex   = 0;
-let dialogIndex  = 0;
-let phase        = 'idle';   // 'dialog' | 'choice' | 'reaction' | 'end'
-let chosenKey    = null;
-let karmaScore   = 0;
-let playerTags   = [];
-let reactionLines = [];
-let rainDrops    = [];
+function loadSave() {
+  try {
+    const raw = localStorage.getItem(SAVE_KEY);
+    save = raw ? JSON.parse(raw) : {};
+  } catch (_) { save = {}; }
 
-// ── DOM refs ──────────────────────────────────────────────────────────────────
-
-const startScreen   = document.getElementById('start-screen');
-const startBtn      = document.getElementById('start-btn');
-const gameEl        = document.getElementById('game');
-const endScreen     = document.getElementById('end-screen');
-const meterFill     = document.getElementById('meter-fill');
-const meterGlow     = document.getElementById('meter-glow');
-const sceneArea     = document.getElementById('scene-area');
-const sceneBg       = document.getElementById('scene-bg');
-const rainLayer     = document.getElementById('rain-layer');
-const locationBadge = document.getElementById('location-badge');
-const sceneChars    = document.getElementById('scene-chars');
-const rippleLayer   = document.getElementById('ripple-layer');
-const dialogBox     = document.getElementById('dialog-box');
-const speakerLabel  = document.getElementById('speaker-label');
-const dialogText    = document.getElementById('dialog-text');
-const nextBtn       = document.getElementById('next-btn');
-const choiceBox     = document.getElementById('choice-box');
-const choicePrompt  = document.getElementById('choice-prompt');
-const choiceList    = document.getElementById('choice-list');
-
-// ── Boot ─────────────────────────────────────────────────────────────────────
-
-startBtn.addEventListener('click', () => {
-  startScreen.style.opacity = '0';
-  startScreen.style.transition = 'opacity 0.6s ease';
-  setTimeout(() => {
-    startScreen.style.display = 'none';
-    gameEl.classList.remove('hidden');
-    beginScene(0);
-  }, 600);
-});
-
-document.getElementById('play-again-btn').addEventListener('click', () => {
-  location.reload();
-});
-
-// ── Scene Management ──────────────────────────────────────────────────────────
-
-function beginScene(index) {
-  sceneIndex  = index;
-  dialogIndex = 0;
-  phase       = 'dialog';
-
-  const scene = SCENES[index];
-
-  // Background
-  sceneBg.className = '';
-  sceneBg.classList.add(scene.bgClass);
-  sceneBg.style.position = 'absolute';
-  sceneBg.style.inset = '0';
-
-  // Location badge
-  locationBadge.textContent = scene.location;
-
-  // Rain
-  clearRain();
-  if (scene.rain) spawnRain();
-
-  // Characters
-  renderChars(scene.chars);
-
-  // Dialog
-  choiceBox.classList.add('hidden');
-  dialogBox.classList.remove('hidden');
-  showLine(scene.dialog[0]);
+  // Defaults
+  save.coins          = save.coins          ?? 0;
+  save.giftName       = save.giftName       ?? '';
+  save.giftTarget     = save.giftTarget     ?? 300;
+  save.unlockedLevels = save.unlockedLevels ?? [0];
+  save.levelStars     = save.levelStars     ?? {};
+  save.goalReached    = save.goalReached    ?? false;
 }
 
-function showLine(line) {
-  if (line.speaker) {
-    speakerLabel.textContent = line.speaker;
-    // Highlight speaking character
-    if (line.charId) {
-      document.querySelectorAll('.char-figure').forEach(el => {
-        el.classList.toggle('speaking', el.dataset.id === line.charId);
-      });
-    }
+function writeSave() {
+  localStorage.setItem(SAVE_KEY, JSON.stringify(save));
+}
+
+// ═══════════════════════════════════════════════════════════════════
+// SCREEN MANAGER
+// ═══════════════════════════════════════════════════════════════════
+
+const SCREENS = ['home-screen', 'game-screen', 'level-complete-screen', 'redeem-screen'];
+
+function showScreen(id) {
+  SCREENS.forEach(s => {
+    document.getElementById(s).classList.toggle('hidden', s !== id);
+  });
+}
+
+// ═══════════════════════════════════════════════════════════════════
+// HOME SCREEN
+// ═══════════════════════════════════════════════════════════════════
+
+function renderHome() {
+  // Coin display
+  document.getElementById('total-coins-display').textContent = save.coins;
+
+  // Gift progress
+  const target  = save.giftTarget;
+  const pct     = Math.min(100, (save.coins / target) * 100);
+  document.getElementById('progress-fill').style.width = pct + '%';
+  document.getElementById('progress-text').textContent = `${save.coins} / ${target} coins`;
+
+  if (save.giftName) {
+    document.getElementById('gift-name-display').textContent = '🎁 ' + save.giftName;
   } else {
-    speakerLabel.textContent = '';
-    document.querySelectorAll('.char-figure').forEach(el => el.classList.remove('speaking'));
+    document.getElementById('gift-name-display').textContent = 'Tap ⚙️ to set your gift goal!';
   }
-  animateText(line.text);
-}
 
-function animateText(text) {
-  dialogText.textContent = '';
-  let i = 0;
-  const interval = setInterval(() => {
-    dialogText.textContent += text[i];
-    i++;
-    if (i >= text.length) clearInterval(interval);
-  }, 22);
-}
+  // Level grid
+  const grid = document.getElementById('level-grid');
+  grid.innerHTML = '';
+  LEVELS.forEach((level, i) => {
+    const unlocked = save.unlockedLevels.includes(i);
+    const stars    = save.levelStars[i] ?? 0;
 
-nextBtn.addEventListener('click', advance);
-// Tap anywhere on dialog box (not next button) also advances
-dialogBox.addEventListener('click', (e) => {
-  if (e.target !== nextBtn) advance();
-});
+    const card = document.createElement('div');
+    card.className = 'level-card' + (unlocked ? '' : ' locked');
+    card.style.background = unlocked
+      ? `linear-gradient(135deg, ${level.color}33, ${level.color}18)`
+      : 'rgba(255,255,255,0.04)';
+    card.style.borderColor = unlocked ? level.color + '55' : 'transparent';
 
-function advance() {
-  if (phase === 'dialog') {
-    const scene = SCENES[sceneIndex];
-    dialogIndex++;
-    if (dialogIndex < scene.dialog.length) {
-      showLine(scene.dialog[dialogIndex]);
-    } else {
-      showChoices(scene);
+    card.innerHTML = `
+      <div class="level-card-emoji">${level.emoji}</div>
+      <div class="level-card-title">Level ${i + 1}: ${level.title}</div>
+      <div class="level-card-sub">${level.timerSec}s per choice</div>
+      <div class="level-card-stars">${starsHTML(stars)}</div>
+      ${unlocked ? '' : '<div class="level-lock">🔒</div>'}
+    `;
+
+    if (unlocked) {
+      card.addEventListener('click', () => startLevel(i));
     }
-  } else if (phase === 'reaction') {
-    dialogIndex++;
-    if (dialogIndex < reactionLines.length) {
-      showLine(reactionLines[dialogIndex]);
-    } else {
-      nextScene();
-    }
-  }
+    grid.appendChild(card);
+  });
+
+  showScreen('home-screen');
+
+  // If goal just reached, show redeem
+  if (save.goalReached) showRedeem();
 }
 
-// ── Choices ───────────────────────────────────────────────────────────────────
+function starsHTML(n) {
+  let s = '';
+  for (let i = 0; i < 3; i++) s += (i < n ? '⭐' : '☆');
+  return s;
+}
 
-function showChoices(scene) {
-  phase = 'choice';
-  dialogBox.classList.add('hidden');
-  choiceBox.classList.remove('hidden');
-  choicePrompt.textContent = scene.choicePrompt;
+// ═══════════════════════════════════════════════════════════════════
+// GAME FLOW
+// ═══════════════════════════════════════════════════════════════════
 
-  choiceList.innerHTML = '';
-  scene.choices.forEach((choice) => {
+function startLevel(idx) {
+  session = {
+    levelIdx:        idx,
+    roundIdx:        0,
+    results:         [],   // 'good' | 'okay' | 'bad' | 'timeout' per round
+    streak:          0,
+    coinsThisLevel:  0,
+  };
+
+  document.getElementById('hud-level').textContent = `Lvl ${idx + 1} · ${LEVELS[idx].title}`;
+  showScreen('game-screen');
+  startRound();
+}
+
+function startRound() {
+  const level    = LEVELS[session.levelIdx];
+  const scenario = level.scenarios[session.roundIdx];
+  const total    = level.scenarios.length;
+
+  // Round info
+  document.getElementById('round-info').textContent =
+    `Round ${session.roundIdx + 1} of ${total}`;
+
+  // Scenario text
+  document.getElementById('scenario-text').textContent = scenario.text;
+
+  // Choices
+  const wrap = document.getElementById('choices-wrap');
+  wrap.innerHTML = '';
+  scenario.choices.forEach((choice, i) => {
     const btn = document.createElement('button');
     btn.className = 'choice-btn';
     btn.textContent = choice.text;
-    btn.addEventListener('click', () => makeChoice(choice));
-    choiceList.appendChild(btn);
+    btn.addEventListener('click', () => makeChoice(i));
+    wrap.appendChild(btn);
   });
+
+  // HUD
+  document.getElementById('hud-coins').textContent = save.coins;
+  updateStreakHUD();
+
+  // Feedback hidden
+  document.getElementById('feedback-overlay').classList.add('hidden');
+
+  // Start timer
+  Timer.start(level.timerSec, onTimerTick, onTimerUp);
 }
 
-function makeChoice(choice) {
-  // Disable all choice buttons
+function makeChoice(choiceIdx) {
+  Timer.stop();
+  const scenario = LEVELS[session.levelIdx].scenarios[session.roundIdx];
+  const choice   = scenario.choices[choiceIdx];
+  const type     = choice.type;
+
+  // Determine coins: fast bonus if > 60% time remaining
+  let coins;
+  if (type === 'good') {
+    coins = Timer.pctRemaining() > 0.6 ? COINS_GOOD_FAST : COINS_GOOD;
+  } else if (type === 'okay') {
+    coins = COINS_OKAY;
+  } else {
+    coins = COINS_BAD;
+  }
+
+  // Streak
+  if (type === 'good') {
+    session.streak++;
+    if (session.streak >= STREAK_AT && session.streak % STREAK_AT === 0) {
+      coins += STREAK_BONUS;
+    }
+  } else {
+    session.streak = 0;
+  }
+
+  applyCoins(coins, type);
+  session.results.push(type);
+  showFeedback(type, coins);
+}
+
+function onTimerUp() {
+  applyCoins(COINS_TIMEOUT, 'timeout');
+  session.results.push('timeout');
+  session.streak = 0;
+  showFeedback('timeout', COINS_TIMEOUT);
+}
+
+function applyCoins(amount, _type) {
+  save.coins = Math.max(0, save.coins + amount);
+  session.coinsThisLevel += amount;
+  document.getElementById('hud-coins').textContent = save.coins;
+  spawnCoinPop((amount >= 0 ? '+' : '') + amount, amount >= 0);
+  writeSave();
+}
+
+// ─── Feedback ─────────────────────────────────────────────────────
+
+function showFeedback(type, coins) {
+  // Disable choice buttons
   document.querySelectorAll('.choice-btn').forEach(b => b.disabled = true);
 
-  // Record
-  karmaScore += choice.karma;
-  if (choice.tag) playerTags.push(choice.tag);
-  chosenKey = choice.key;
+  const overlay = document.getElementById('feedback-overlay');
+  const inner   = document.getElementById('feedback-inner');
+  const iconEl  = document.getElementById('feedback-icon');
+  const msgEl   = document.getElementById('feedback-msg');
+  const coinsEl = document.getElementById('feedback-coins');
 
-  // Update meter
-  updateMeter();
+  inner.className = type;
 
-  // Spawn ripple at main character position
-  const mainChar = SCENES[sceneIndex].chars[0];
-  spawnRipple(mainChar.xPct, mainChar.yPct, choice.karma);
+  const icons = { good: '✅', okay: '👍', bad: '❌', timeout: '⏰' };
+  const msgs  = FEEDBACK_MSGS[type];
+  iconEl.textContent  = icons[type];
+  msgEl.textContent   = msgs[Math.floor(Math.random() * msgs.length)];
+  coinsEl.textContent = (coins >= 0 ? '+' : '') + coins + ' coins';
 
-  // After short pause, show reaction
-  setTimeout(() => {
-    choiceBox.classList.add('hidden');
-    dialogBox.classList.remove('hidden');
-    reactionLines = SCENES[sceneIndex].reactions[chosenKey];
-    dialogIndex   = 0;
-    phase         = 'reaction';
-    showLine(reactionLines[0]);
-  }, 900);
+  overlay.classList.remove('hidden');
+  updateStreakHUD();
+
+  setTimeout(afterFeedback, 1500);
 }
 
-// ── Scene Transition ──────────────────────────────────────────────────────────
+function afterFeedback() {
+  document.getElementById('feedback-overlay').classList.add('hidden');
+  session.roundIdx++;
 
-function nextScene() {
-  sceneIndex++;
-  if (sceneIndex < SCENES.length) {
-    // Fade transition
-    sceneArea.style.opacity = '0';
-    sceneArea.style.transition = 'opacity 0.4s ease';
-    setTimeout(() => {
-      beginScene(sceneIndex);
-      sceneArea.style.opacity = '1';
-    }, 400);
+  const total = LEVELS[session.levelIdx].scenarios.length;
+  if (session.roundIdx < total) {
+    startRound();
   } else {
-    showEpilogue();
+    endLevel();
   }
 }
 
-// ── Epilogue ──────────────────────────────────────────────────────────────────
+// ─── Streak HUD ───────────────────────────────────────────────────
 
-function showEpilogue() {
-  // Determine ending
-  let endingKey;
-  if (karmaScore >= 5)      endingKey = 'warm';
-  else if (karmaScore >= 0) endingKey = 'mixed';
-  else                      endingKey = 'cold';
-
-  const ending = ENDINGS[endingKey];
-
-  // Collect callbacks the player earned
-  const earned = playerTags
-    .filter(tag => CALLBACKS[tag])
-    .map(tag => CALLBACKS[tag]);
-
-  // Populate end screen
-  document.getElementById('end-emoji-big').textContent = ending.emoji;
-  document.getElementById('end-title').textContent     = ending.title;
-  document.getElementById('end-message').textContent   = ending.message;
-
-  const callbacksEl = document.getElementById('end-callbacks');
-  callbacksEl.innerHTML = '';
-
-  if (earned.length > 0) {
-    earned.forEach((cb, i) => {
-      const card = document.createElement('div');
-      card.className = 'callback-card';
-      card.style.animationDelay = `${i * 0.15 + 0.3}s`;
-      card.innerHTML = `
-        <span class="callback-emoji">${cb.emoji}</span>
-        <span class="callback-text">${cb.text}</span>
-      `;
-      callbacksEl.appendChild(card);
-    });
+function updateStreakHUD() {
+  const el = document.getElementById('hud-streak');
+  if (session.streak >= 2) {
+    el.textContent = `🔥 ${session.streak} streak`;
   } else {
-    const card = document.createElement('div');
-    card.className = 'callback-card';
-    card.style.animationDelay = '0.3s';
-    card.innerHTML = `
-      <span class="callback-emoji">🌱</span>
-      <span class="callback-text">No one stepped forward this time. But kindness is a skill — and every day is a chance to practice it.</span>
-    `;
-    callbacksEl.appendChild(card);
+    el.textContent = '';
   }
-
-  // Show end screen with ripple animation
-  gameEl.classList.add('hidden');
-  endScreen.classList.remove('hidden');
-  spawnEndRipples(endingKey);
 }
 
-// ── Visual Helpers ────────────────────────────────────────────────────────────
+// ─── End Level ────────────────────────────────────────────────────
 
-function renderChars(chars) {
-  sceneChars.innerHTML = '';
-  chars.forEach(ch => {
-    const fig = document.createElement('div');
-    fig.className = 'char-figure';
-    fig.dataset.id = ch.id;
-    fig.style.left   = ch.xPct + '%';
-    fig.style.top    = ch.yPct + '%';
+function endLevel() {
+  Timer.stop();
+  const level  = LEVELS[session.levelIdx];
+  const goodCount = session.results.filter(r => r === 'good').length;
+  const total     = session.results.length;
+  const stars     = goodCount >= 6 ? 3 : goodCount >= 4 ? 2 : 1;
 
-    const emojiEl = document.createElement('div');
-    emojiEl.className = 'char-emoji';
-    emojiEl.style.fontSize = ch.size || '4rem';
-    emojiEl.textContent = ch.emoji;
+  // Update save
+  const prev = save.levelStars[session.levelIdx] ?? 0;
+  save.levelStars[session.levelIdx] = Math.max(prev, stars);
 
-    fig.appendChild(emojiEl);
+  // Unlock next level
+  const next = session.levelIdx + 1;
+  if (next < LEVELS.length && !save.unlockedLevels.includes(next)) {
+    save.unlockedLevels.push(next);
+  }
 
-    if (ch.label) {
-      const lbl = document.createElement('div');
-      lbl.className = 'char-label';
-      lbl.textContent = ch.label;
-      fig.appendChild(lbl);
+  // Perfect level bonus
+  if (goodCount === total) {
+    save.coins += 50;
+    session.coinsThisLevel += 50;
+  }
+
+  // Check goal
+  if (!save.goalReached && save.coins >= save.giftTarget && save.giftName) {
+    save.goalReached = true;
+  }
+
+  writeSave();
+
+  // Render level complete screen
+  document.getElementById('lc-emoji').textContent = level.emoji;
+  document.getElementById('lc-title').textContent = `Level ${session.levelIdx + 1} Complete!`;
+  document.getElementById('lc-stars').textContent  = starsHTML(stars);
+
+  const earned = session.coinsThisLevel;
+  const bonusNote = goodCount === total ? ' (+50 perfect bonus!)' : '';
+  document.getElementById('lc-coins-earned').innerHTML =
+    `<strong style="color:#fbbf24">+${earned} coins</strong> earned this level${bonusNote}`;
+
+  const btns = document.getElementById('lc-buttons');
+  btns.innerHTML = '';
+
+  if (save.goalReached) {
+    const btn = document.createElement('button');
+    btn.className = 'btn';
+    btn.textContent = '🎉 Claim Your Gift!';
+    btn.addEventListener('click', showRedeem);
+    btns.appendChild(btn);
+  } else {
+    if (next < LEVELS.length) {
+      const nxt = document.createElement('button');
+      nxt.className = 'btn';
+      nxt.textContent = `Next Level →`;
+      nxt.addEventListener('click', () => startLevel(next));
+      btns.appendChild(nxt);
     }
+    const home = document.createElement('button');
+    home.className = 'btn-ghost';
+    home.textContent = '← Home';
+    home.addEventListener('click', () => renderHome());
+    btns.appendChild(home);
+  }
 
-    sceneChars.appendChild(fig);
-  });
+  showScreen('level-complete-screen');
 }
 
-function spawnRipple(xPct, yPct, karma) {
-  // Color based on karma
-  let color, delay;
-  if (karma > 0)      color = ['#FFD700', '#FFC947', '#FFAA00'];
-  else if (karma < 0) color = ['#667799', '#556688', '#445577'];
-  else                color = ['#88aacc', '#779ac0', '#6688aa'];
+// ─── Redeem ───────────────────────────────────────────────────────
 
-  [0, 280, 560].forEach((delayMs, i) => {
-    const ring = document.createElement('div');
-    ring.className = 'ripple-ring';
-    ring.style.width       = '60px';
-    ring.style.height      = '60px';
-    ring.style.left        = xPct + '%';
-    ring.style.top         = yPct + '%';
-    ring.style.borderColor = color[i] || color[0];
-    ring.style.animationDelay = delayMs + 'ms';
-    ring.style.animationDuration = '1.1s';
-    rippleLayer.appendChild(ring);
-    setTimeout(() => ring.remove(), delayMs + 1200);
-  });
+function showRedeem() {
+  document.getElementById('redeem-gift-name').textContent = save.giftName || 'Your Gift';
+  document.getElementById('redeem-total').textContent = `Total coins earned: 🪙 ${save.coins}`;
+
+  document.getElementById('redeem-new-btn').onclick = () => {
+    save.goalReached = false;
+    writeSave();
+    openParentModal();
+  };
+
+  launchConfetti();
+  showScreen('redeem-screen');
 }
 
-function updateMeter() {
-  // karmaScore range: -8 to +8 (4 scenes × max 2)
-  const MIN = -8, MAX = 8;
-  const pct = ((karmaScore - MIN) / (MAX - MIN)) * 100;
-  const clamped = Math.max(2, Math.min(98, pct));
-
-  meterFill.style.width = clamped + '%';
-  meterGlow.style.left  = clamped + '%';
-
-  // Color shift warm → cool
-  if (karmaScore >= 3) {
-    meterFill.style.background = 'linear-gradient(90deg, #e8a020, #FFD700)';
-    meterGlow.style.background = '#FFD700';
-    meterGlow.style.boxShadow  = '0 0 10px 3px rgba(255, 215, 0, 0.6)';
-  } else if (karmaScore >= 0) {
-    meterFill.style.background = 'linear-gradient(90deg, #4a7abf, #6c63ff)';
-    meterGlow.style.background = '#6c63ff';
-    meterGlow.style.boxShadow  = '0 0 10px 3px rgba(108, 99, 255, 0.5)';
-  } else {
-    meterFill.style.background = 'linear-gradient(90deg, #334455, #556677)';
-    meterGlow.style.background = '#556677';
-    meterGlow.style.boxShadow  = '0 0 6px 2px rgba(85, 102, 119, 0.4)';
+function launchConfetti() {
+  const burst = document.getElementById('redeem-burst');
+  burst.innerHTML = '';
+  const items = ['🪙','⭐','🌟','✨','🎉','💛'];
+  for (let i = 0; i < 30; i++) {
+    const el = document.createElement('div');
+    el.className = 'burst-coin';
+    el.textContent = items[Math.floor(Math.random() * items.length)];
+    el.style.left = (Math.random() * 100) + '%';
+    el.style.animationDuration = (2 + Math.random() * 3) + 's';
+    el.style.animationDelay    = (Math.random() * 2) + 's';
+    el.style.fontSize = (1 + Math.random()) + 'rem';
+    burst.appendChild(el);
   }
 }
 
-// ── Rain ───────────────────────────────────────────────────────────────────────
+// ═══════════════════════════════════════════════════════════════════
+// TIMER
+// ═══════════════════════════════════════════════════════════════════
 
-function spawnRain() {
-  for (let i = 0; i < 35; i++) {
-    const drop = document.createElement('div');
-    drop.className = 'rain-drop';
-    const h = 8 + Math.random() * 14;
-    drop.style.cssText = `
-      left: ${Math.random() * 100}%;
-      top:  ${Math.random() * 100}%;
-      height: ${h}px;
-      animation-duration: ${0.5 + Math.random() * 0.4}s;
-      animation-delay:    ${Math.random() * 1}s;
-      opacity: ${0.3 + Math.random() * 0.4};
-    `;
-    rainLayer.appendChild(drop);
-    rainDrops.push(drop);
+const Timer = {
+  _raf: null,
+  _end: 0,
+  _total: 0,
+
+  start(seconds, _onTick, onEnd) {
+    this.stop();
+    this._total = seconds * 1000;
+    this._end   = performance.now() + this._total;
+    this._onEnd = onEnd;
+
+    const bar = document.getElementById('timer-bar');
+    bar.style.transition = 'none';
+    bar.style.width = '100%';
+
+    const tick = (now) => {
+      const remaining = this._end - now;
+      const pct = Math.max(0, remaining / this._total);
+
+      bar.style.width = (pct * 100) + '%';
+      bar.style.background = pct > 0.5 ? '#22c55e' : pct > 0.25 ? '#eab308' : '#ef4444';
+
+      if (pct <= 0) {
+        bar.style.width = '0%';
+        this._raf = null;
+        onEnd();
+        return;
+      }
+      this._raf = requestAnimationFrame(tick);
+    };
+    this._raf = requestAnimationFrame(tick);
+  },
+
+  stop() {
+    if (this._raf) { cancelAnimationFrame(this._raf); this._raf = null; }
+  },
+
+  pctRemaining() {
+    return Math.max(0, (this._end - performance.now()) / this._total);
+  },
+};
+
+// ═══════════════════════════════════════════════════════════════════
+// COIN POP ANIMATION
+// ═══════════════════════════════════════════════════════════════════
+
+function spawnCoinPop(text, positive) {
+  const layer = document.getElementById('coin-pop-layer');
+  const el    = document.createElement('div');
+  el.className   = 'coin-pop';
+  el.textContent = text;
+  el.style.color = positive ? '#4ade80' : '#f87171';
+  el.style.left  = (30 + Math.random() * 40) + '%';
+  el.style.top   = (40 + Math.random() * 20) + '%';
+  layer.appendChild(el);
+  setTimeout(() => el.remove(), 1100);
+}
+
+// ═══════════════════════════════════════════════════════════════════
+// PARENT SETTINGS
+// ═══════════════════════════════════════════════════════════════════
+
+function openParentModal() {
+  document.getElementById('gift-name-input').value   = save.giftName || '';
+  document.getElementById('gift-target-input').value = save.giftTarget || 300;
+  document.getElementById('parent-modal').classList.remove('hidden');
+}
+
+document.getElementById('parent-btn').addEventListener('click', openParentModal);
+
+document.getElementById('parent-save-btn').addEventListener('click', () => {
+  const name   = document.getElementById('gift-name-input').value.trim();
+  const target = parseInt(document.getElementById('gift-target-input').value, 10);
+
+  if (name)              save.giftName   = name;
+  if (target >= 50)      save.giftTarget = target;
+  writeSave();
+
+  document.getElementById('parent-modal').classList.add('hidden');
+  renderHome();
+});
+
+document.getElementById('parent-cancel-btn').addEventListener('click', () => {
+  document.getElementById('parent-modal').classList.add('hidden');
+});
+
+document.getElementById('reset-btn').addEventListener('click', () => {
+  if (confirm('Reset ALL progress and coins? This cannot be undone.')) {
+    const name   = save.giftName;
+    const target = save.giftTarget;
+    localStorage.removeItem(SAVE_KEY);
+    loadSave();
+    save.giftName   = name;
+    save.giftTarget = target;
+    writeSave();
+    document.getElementById('parent-modal').classList.add('hidden');
+    renderHome();
   }
-}
+});
 
-function clearRain() {
-  rainDrops.forEach(d => d.remove());
-  rainDrops = [];
-}
+// Close modal on backdrop click
+document.getElementById('parent-modal').addEventListener('click', (e) => {
+  if (e.target === document.getElementById('parent-modal')) {
+    document.getElementById('parent-modal').classList.add('hidden');
+  }
+});
 
-// ── End Screen Ripple Animation ───────────────────────────────────────────────
+// ═══════════════════════════════════════════════════════════════════
+// INIT
+// ═══════════════════════════════════════════════════════════════════
 
-function spawnEndRipples(endingKey) {
-  const canvas = document.getElementById('end-ripples-canvas');
-  const colors = endingKey === 'warm'
-    ? ['#FFD700', '#FFC947', '#ffaa00', '#fbbf24']
-    : endingKey === 'mixed'
-    ? ['#7dd3fc', '#818cf8', '#a78bfa']
-    : ['#667799', '#445566', '#334455'];
-
-  canvas.innerHTML = '';
-  colors.forEach((color, i) => {
-    const ring = document.createElement('div');
-    ring.style.cssText = `
-      position: absolute;
-      top: 50%; left: 50%;
-      border-radius: 50%;
-      border: 2px solid ${color};
-      width: 40px; height: 40px;
-      transform: translate(-50%, -50%);
-      animation: rippleExpand 2.5s ease-out ${i * 0.5}s infinite;
-    `;
-    canvas.appendChild(ring);
-  });
-}
+loadSave();
+renderHome();

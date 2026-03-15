@@ -1,11 +1,12 @@
 {
-  "id": "ripple",
-  "title": "The Ripple",
-  "description": "Every choice sends a ripple into the world. What you put out... comes back.",
-  "emoji": "🌊",
+  "id": "kindcoins",
+  "title": "KindCoins",
+  "description": "Earn coins for good choices across 5 levels. Redeem them for a real gift!",
+  "emoji": "🪙",
   "version": "1.0.0",
   "author": "Jai",
   "ageRange": "7-14",
-  "genre": "choice-story",
-  "theme": "kindness, empathy, karma"
+  "genre": "choice-quiz",
+  "levels": 5,
+  "scenariosPerLevel": 8
 }

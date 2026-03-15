@@ -2,7 +2,7 @@
   {
     "id": "platformer",
     "path": "games/platformer/",
-    "title": "Jai's Platformer",
+    "title": "Platformer",
     "description": "Jump and run across platforms! Collect all coins to win.",
     "emoji": "🎮",
     "color": "#6C63FF"

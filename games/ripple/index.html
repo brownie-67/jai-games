@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>The Ripple</title>
+  <link rel="stylesheet" href="../../shared/style.css" />
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+
+  <div class="topbar">
+    <a href="../../index.html">← Arcade</a>
+    <h1>🌊 The Ripple</h1>
+  </div>
+
+  <!-- ── Start Screen ── -->
+  <div id="start-screen">
+    <div class="start-inner">
+      <div class="start-ripple-ring r1"></div>
+      <div class="start-ripple-ring r2"></div>
+      <div class="start-ripple-ring r3"></div>
+      <div class="start-emoji">🌊</div>
+      <h2>The Ripple</h2>
+      <p class="start-sub">Every choice sends a ripple into the world.<br>What you put out&hellip; comes back.</p>
+      <p class="age-tag">A story about kindness &middot; Ages 7&ndash;14</p>
+      <button id="start-btn" class="btn">Begin Your Story</button>
+    </div>
+  </div>
+
+  <!-- ── Main Game ── -->
+  <div id="game" class="hidden">
+
+    <!-- Ripple Meter -->
+    <div id="meter-wrap">
+      <span class="meter-icon">❄️</span>
+      <div id="meter-track">
+        <div id="meter-fill"></div>
+        <div id="meter-glow"></div>
+      </div>
+      <span class="meter-icon">☀️</span>
+    </div>
+    <div id="meter-caption">Your Ripple</div>
+
+    <!-- Scene Area -->
+    <div id="scene-area">
+      <div id="scene-bg"></div>
+      <div id="rain-layer"></div>
+      <div id="location-badge"></div>
+      <div id="scene-chars"></div>
+      <div id="ripple-layer"></div>
+    </div>
+
+    <!-- Story Panel -->
+    <div id="story-panel">
+
+      <!-- Dialog box -->
+      <div id="dialog-box">
+        <div id="speaker-label"></div>
+        <p id="dialog-text"></p>
+        <button id="next-btn" class="btn-next">Next ▶</button>
+      </div>
+
+      <!-- Choice box -->
+      <div id="choice-box" class="hidden">
+        <p id="choice-prompt"></p>
+        <div id="choice-list"></div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- ── End Screen ── -->
+  <div id="end-screen" class="hidden">
+    <div class="end-inner">
+      <div id="end-ripples-canvas"></div>
+      <div id="end-emoji-big"></div>
+      <h2 id="end-title"></h2>
+      <p id="end-message"></p>
+      <div id="end-callbacks"></div>
+      <button id="play-again-btn" class="btn">Play Again ↺</button>
+    </div>
+  </div>
+
+  <script src="game.js"></script>
+</body>
+</html>

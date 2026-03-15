@@ -1,5 +1,13 @@
 [
   {
+    "id": "ripple",
+    "path": "games/ripple/",
+    "title": "The Ripple",
+    "description": "Every choice sends a ripple. What you put out... comes back.",
+    "emoji": "🌊",
+    "color": "#4a90e2"
+  },
+  {
     "id": "sudoku",
     "path": "games/sudoku/",
     "title": "Fruit Sudoku",

@@ -529,7 +529,7 @@ loadConfig().then(config => {
   buildLevel(1);
   buildPlayer();
   draw();
-  overlayH2.textContent  = "🎮 Platformer";
+  overlayH2.textContent  = "🪙 Platformer";
   overlayP.textContent   = '5 levels · collect all coins · dodge the spikes!';
   overlayBtn.textContent = 'Start Game';
   overlay.classList.remove('hidden');

@@ -1,11 +1,19 @@
 [
   {
-    "id": "ripple",
-    "path": "games/ripple/",
-    "title": "KindCoins",
-    "description": "Earn coins for good choices across 5 levels. Redeem them for a real gift!",
-    "emoji": "💝",
-    "color": "#f59e0b"
+    "id": "suspect",
+    "path": "games/suspect/",
+    "title": "Suspect",
+    "description": "Find the killer among the noobs before it's too late!",
+    "emoji": "🔍",
+    "color": "#e63946"
+  },
+  {
+    "id": "platformer",
+    "path": "games/platformer/",
+    "title": "Platformer",
+    "description": "Jump and run across platforms! Collect all coins to win.",
+    "emoji": "🪙",
+    "color": "#6C63FF"
   },
   {
     "id": "sudoku",
@@ -16,11 +24,11 @@
     "color": "#22c55e"
   },
   {
-    "id": "platformer",
-    "path": "games/platformer/",
-    "title": "Platformer",
-    "description": "Jump and run across platforms! Collect all coins to win.",
-    "emoji": "🪙",
-    "color": "#6C63FF"
+    "id": "ripple",
+    "path": "games/ripple/",
+    "title": "KindCoins",
+    "description": "Earn coins for good choices across 5 levels. Redeem them for a real gift!",
+    "emoji": "💝",
+    "color": "#f59e0b"
   }
 ]

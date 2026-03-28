@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no" />
+  <title>Suspect – Jai's Arcade</title>
+  <link rel="stylesheet" href="../../shared/style.css" />
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+
+  <!-- ── MENU SCREEN ─────────────────────────────── -->
+  <div id="s-menu" class="screen active">
+    <a href="../../index.html" class="back-link">← Arcade</a>
+    <div class="menu-inner">
+      <div class="game-logo">
+        <span class="logo-icon">🔍</span>
+        <h1 class="logo-title">SUSPECT</h1>
+        <p class="logo-sub">Find the killer before it's too late...</p>
+      </div>
+      <p class="choose-label">Choose number of players</p>
+      <div class="diff-grid">
+        <button class="diff-card" onclick="pickDifficulty(3)">
+          <span class="diff-icon">👥</span>
+          <span class="diff-name">Low</span>
+          <span class="diff-count">3 Players</span>
+        </button>
+        <button class="diff-card featured" onclick="pickDifficulty(5)">
+          <span class="diff-icon">👥</span>
+          <span class="diff-name">Standard</span>
+          <span class="diff-count">5 Players</span>
+          <span class="diff-badge">⭐ Best</span>
+        </button>
+        <button class="diff-card" onclick="pickDifficulty(7)">
+          <span class="diff-icon">👥</span>
+          <span class="diff-name">High</span>
+          <span class="diff-count">7 Players</span>
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── ROLE REVEAL SCREEN ──────────────────────── -->
+  <div id="s-role" class="screen">
+    <div class="role-inner">
+      <p class="you-are-text">You are...</p>
+      <div class="spinner-box">
+        <div id="spin-label" class="spin-label">???</div>
+      </div>
+      <div id="role-icon" class="role-icon" style="display:none"></div>
+      <p id="role-desc" class="role-desc" style="display:none"></p>
+      <button id="role-btn" class="btn-primary" style="display:none" onclick="beginPlay()">
+        Start Game
+      </button>
+    </div>
+  </div>
+
+  <!-- ── GAME SCREEN ─────────────────────────────── -->
+  <div id="s-playing" class="screen">
+    <div id="topbar">
+      <span id="hud-role" class="hud-pill"></span>
+      <span id="hud-alive" class="hud-pill"></span>
+      <span id="hud-tip" class="hud-tip"></span>
+    </div>
+    <div class="canvas-wrap">
+      <canvas id="gameCanvas" width="1000" height="640"></canvas>
+      <div id="spectate-banner" class="spectate-banner" style="display:none">
+        👻 You are dead — spectating the killer
+      </div>
+      <button id="btn-interact" class="btn-interact" style="display:none" onclick="handleInteract()">
+        INTERACT
+      </button>
+    </div>
+    <div id="mobile-ui">
+      <div id="joystick-zone">
+        <div id="joystick-base">
+          <div id="joystick-knob"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── MEETING SCREEN ─────────────────────────── -->
+  <div id="s-meeting" class="screen">
+    <div class="meeting-wrap">
+      <div class="meeting-header">
+        <h2 class="meeting-title">🚨 EMERGENCY MEETING</h2>
+        <p id="mtg-reporter" class="mtg-reporter"></p>
+        <div class="mtg-timer-row">
+          <div class="mtg-timer-track">
+            <div id="timer-bar" class="mtg-timer-bar"></div>
+          </div>
+          <span id="timer-txt" class="timer-txt">30</span>
+        </div>
+      </div>
+      <div id="vote-list" class="vote-list"></div>
+      <button class="btn-skip" onclick="castVote(null)">Skip Vote</button>
+    </div>
+  </div>
+
+  <!-- ── EJECTED SCREEN ─────────────────────────── -->
+  <div id="s-ejected" class="screen">
+    <div class="ejected-wrap">
+      <canvas id="ejectedCanvas" width="120" height="160"></canvas>
+      <h2 id="ej-name" class="ej-name"></h2>
+      <p id="ej-verdict" class="ej-verdict"></p>
+    </div>
+  </div>
+
+  <!-- ── RESULT SCREEN ──────────────────────────── -->
+  <div id="s-result" class="screen">
+    <div class="result-wrap">
+      <div id="res-icon" class="res-icon"></div>
+      <h2 id="res-title" class="res-title"></h2>
+      <p id="res-sub" class="res-sub"></p>
+      <button class="btn-primary" onclick="goMenu()">Play Again</button>
+      <a href="../../index.html" class="btn-ghost">← Arcade</a>
+    </div>
+  </div>
+
+  <script src="game.js"></script>
+</body>
+</html>

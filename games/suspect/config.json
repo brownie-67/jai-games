@@ -1,0 +1,10 @@
+{
+  "id": "suspect",
+  "title": "Suspect",
+  "description": "Find the killer among the noobs before it's too late!",
+  "emoji": "🔍",
+  "version": "1.0.0",
+  "author": "Jai & Jai's Son",
+  "ageRange": "7+",
+  "genre": "social-deduction"
+}

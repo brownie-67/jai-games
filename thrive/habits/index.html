@@ -551,6 +551,16 @@
     '🎸','🤸','🧠','🌟','🦋','🎲'
   ];
 
+  const EMOJI_NAMES = {
+    '📖': 'Reading',            '💪': 'Dumbbells',
+    '🧘': 'Meditation',         '🏓': 'Ping Pong',
+    '🤖': 'Explore AI',         '🎨': 'Drawing',
+    '💻': 'Coding',             '🏃': 'Walk / Run',
+    '♟️': 'Chess',              '💧': 'Drink Water',
+    '🎵': 'Practice Instrument','🌳': 'Play Outdoors',
+    '🧹': 'Tidy My Room',       '🌙': 'Sleep on Time',
+  };
+
   const DEFAULT_HABITS = [
     { id: 'reading',    name: 'Reading',             emoji: '📖', order: 0  },
     { id: 'dumbbells',  name: 'Dumbbells',            emoji: '💪', order: 1  },
@@ -923,6 +933,9 @@
     document.querySelectorAll('.emoji-btn').forEach(btn => {
       btn.addEventListener('click', () => {
         pickedEmoji = btn.dataset.e;
+        const autoName = EMOJI_NAMES[pickedEmoji] || '';
+        $('habit-name-in').value = autoName;
+        if (!autoName) $('habit-name-in').focus();
         buildEmojiGrid();
       });
     });

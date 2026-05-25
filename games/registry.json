@@ -1,7 +1,7 @@
 [
   {
     "id": "suspect",
-    "path": "games/suspect/",
+    "path": "suspect/",
     "title": "Suspect",
     "description": "Find the killer among the noobs before it's too late!",
     "emoji": "🔍",
@@ -9,7 +9,7 @@
   },
   {
     "id": "platformer",
-    "path": "games/platformer/",
+    "path": "platformer/",
     "title": "Platformer",
     "description": "Jump and run across platforms! Collect all coins to win.",
     "emoji": "🪙",
@@ -17,7 +17,7 @@
   },
   {
     "id": "sudoku",
-    "path": "games/sudoku/",
+    "path": "sudoku/",
     "title": "Fruit Sudoku",
     "description": "Fill every row, column and box with each fruit exactly once!",
     "emoji": "🍎",
@@ -25,7 +25,7 @@
   },
   {
     "id": "ripple",
-    "path": "games/ripple/",
+    "path": "ripple/",
     "title": "KindCoins",
     "description": "Earn coins for good choices across 5 levels. Redeem them for a real gift!",
     "emoji": "💝",

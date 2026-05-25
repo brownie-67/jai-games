@@ -3,20 +3,26 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Jai's Arcade</title>
+  <title>Jai's World</title>
   <link rel="stylesheet" href="shared/style.css" />
   <style>
-    /* ─── Arcade Homepage ─── */
+    /* ─── Hub Page ─── */
+
+    body {
+      display: flex;
+      flex-direction: column;
+      min-height: 100vh;
+    }
 
     header {
       text-align: center;
-      padding: 48px 24px 24px;
+      padding: 56px 24px 28px;
     }
 
     header h1 {
       font-size: 3rem;
       letter-spacing: 2px;
-      background: linear-gradient(135deg, #6C63FF, #ff6584);
+      background: linear-gradient(135deg, #6C63FF, #10b981);
       -webkit-background-clip: text;
       -webkit-text-fill-color: transparent;
       background-clip: text;
@@ -24,94 +30,108 @@
 
     header p {
       color: var(--text-muted);
-      margin-top: 8px;
+      margin-top: 10px;
       font-size: 1.1rem;
     }
 
     .divider {
       width: 60px;
       height: 4px;
-      background: linear-gradient(135deg, #6C63FF, #ff6584);
+      background: linear-gradient(135deg, #6C63FF, #10b981);
       border-radius: 2px;
       margin: 16px auto;
     }
 
-    /* ─── Game Grid ─── */
+    /* ─── Hub Grid ─── */
 
-    #game-grid {
+    .hub-grid {
       display: grid;
-      grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
-      gap: 24px;
-      max-width: 1100px;
-      margin: 40px auto;
-      padding: 0 24px;
+      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+      gap: 28px;
+      max-width: 760px;
+      margin: 0 auto;
+      padding: 20px 24px 60px;
+      flex: 1;
+      align-content: center;
     }
 
-    .game-card {
+    .hub-card {
       background: var(--surface);
       border-radius: var(--radius);
-      border: 1px solid rgba(108, 99, 255, 0.2);
-      overflow: hidden;
-      transition: transform 0.2s, border-color 0.2s, box-shadow 0.2s;
-      cursor: pointer;
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      padding: 40px 32px 36px;
+      text-align: center;
       text-decoration: none;
-      display: block;
-    }
-
-    .game-card:hover {
-      transform: translateY(-4px);
-      border-color: var(--accent);
-      box-shadow: 0 8px 30px rgba(108, 99, 255, 0.25);
-      text-decoration: none;
-    }
-
-    .card-banner {
-      height: 120px;
       display: flex;
+      flex-direction: column;
       align-items: center;
-      justify-content: center;
-      font-size: 3.5rem;
+      gap: 12px;
+      transition: transform 0.2s, border-color 0.2s, box-shadow 0.2s;
     }
 
-    .card-body {
-      padding: 16px 20px 20px;
+    .hub-card:hover {
+      transform: translateY(-6px);
+      text-decoration: none;
     }
 
-    .card-body h2 {
-      font-size: 1.15rem;
+    .hub-card:hover { text-decoration: none; }
+
+    .games-card {
+      border-color: rgba(108, 99, 255, 0.25);
+    }
+
+    .games-card:hover {
+      border-color: var(--accent);
+      box-shadow: 0 10px 40px rgba(108, 99, 255, 0.25);
+    }
+
+    .thrive-card {
+      border-color: rgba(16, 185, 129, 0.25);
+    }
+
+    .thrive-card:hover {
+      border-color: var(--thrive-accent);
+      box-shadow: 0 10px 40px rgba(16, 185, 129, 0.25);
+    }
+
+    .hub-icon {
+      font-size: 4rem;
+      line-height: 1;
+      margin-bottom: 4px;
+    }
+
+    .hub-card h2 {
+      font-size: 1.6rem;
       color: var(--text);
-      margin-bottom: 6px;
     }
 
-    .card-body p {
-      font-size: 0.875rem;
+    .hub-card p {
+      font-size: 0.95rem;
       color: var(--text-muted);
       line-height: 1.5;
     }
 
-    .card-play {
+    .hub-cta {
       display: inline-block;
-      margin-top: 14px;
-      padding: 7px 18px;
-      background: var(--accent);
-      color: #fff;
-      border-radius: 20px;
-      font-size: 0.85rem;
+      margin-top: 8px;
+      padding: 9px 22px;
+      border-radius: 24px;
+      font-size: 0.9rem;
       font-weight: 600;
+      color: #fff;
     }
 
-    /* ─── Loading / Empty States ─── */
+    .games-card .hub-cta {
+      background: var(--accent);
+    }
 
-    .state-msg {
-      text-align: center;
-      color: var(--text-muted);
-      padding: 60px 24px;
-      grid-column: 1 / -1;
+    .thrive-card .hub-cta {
+      background: var(--thrive-accent);
     }
 
     footer {
       text-align: center;
-      padding: 40px 24px;
+      padding: 28px 24px;
       color: var(--text-muted);
       font-size: 0.8rem;
     }
@@ -120,51 +140,32 @@
 <body>
 
   <header>
-    <h1>🕹️ Jai's Arcade</h1>
+    <h1>🌟 Jai's World</h1>
     <div class="divider"></div>
-    <p>Pick a game and start playing!</p>
+    <p>Games &amp; Learning — all in one place</p>
   </header>
 
-  <div id="game-grid">
-    <p class="state-msg">Loading games...</p>
+  <div class="hub-grid">
+
+    <a class="hub-card games-card" href="games/">
+      <div class="hub-icon">🎮</div>
+      <h2>Games</h2>
+      <p>Fun arcade games to play and enjoy</p>
+      <span class="hub-cta">Explore Games →</span>
+    </a>
+
+    <a class="hub-card thrive-card" href="thrive/">
+      <div class="hub-icon">🌱</div>
+      <h2>Thrive</h2>
+      <p>Habit tracker, puzzles &amp; learning apps</p>
+      <span class="hub-cta">Explore Thrive →</span>
+    </a>
+
   </div>
 
   <footer>
     Made with ❤️ by Jai &amp; Dad
   </footer>
-
-  <script>
-    async function loadGames() {
-      const grid = document.getElementById('game-grid');
-      try {
-        const res = await fetch('games/registry.json');
-        const games = await res.json();
-
-        if (!games.length) {
-          grid.innerHTML = '<p class="state-msg">No games yet — coming soon!</p>';
-          return;
-        }
-
-        grid.innerHTML = games.map(g => `
-          <a class="game-card" href="${g.path}">
-            <div class="card-banner" style="background: ${g.color}22;">
-              ${g.emoji || '🎮'}
-            </div>
-            <div class="card-body">
-              <h2>${g.title}</h2>
-              <p>${g.description}</p>
-              <span class="card-play">▶ Play</span>
-            </div>
-          </a>
-        `).join('');
-
-      } catch (e) {
-        grid.innerHTML = '<p class="state-msg">Could not load games. Make sure you are running this from a local server or GitHub Pages.</p>';
-      }
-    }
-
-    loadGames();
-  </script>
 
 </body>
 </html>

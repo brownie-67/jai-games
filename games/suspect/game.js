@@ -8,7 +8,7 @@
 const W = 1000, H = 640;
 
 // ── Gameplay constants ──────────────────────────────────────
-const PSPEED     = 3.2;    // player move speed (px/frame)
+const PSPEED     = 2.55;   // player move speed (px/frame — 1.5× NPC speed)
 const NSPEED     = 1.7;    // NPC move speed
 const KILL_R     = 58;     // max distance to kill / be killed
 const WITN_R     = 165;    // witness detection radius
@@ -21,6 +21,17 @@ const MTG_SECS   = 30;     // meeting vote timer
 // ── Player names & colours (index 0 = human player) ────────
 const NAMES  = ['You','RedBrick','BluBlock','GreenGuy','YelloBot','PinkPro','CyanPro'];
 const COLORS = ['#4fc3f7','#e74c3c','#2ecc71','#f1c40f','#e91e8c','#00bcd4','#ff9800'];
+
+// ── Unique skin styles per player slot ──────────────────────
+const SKINS = [
+  { hat: 'cap',      tone: '#f5cba7', eyes: 'normal' }, // 0 You      — flat cap
+  { hat: 'tophat',   tone: '#f0c090', eyes: 'normal' }, // 1 RedBrick — top hat
+  { hat: 'spiky',    tone: '#ffe0bd', eyes: 'normal' }, // 2 BluBlock — spiky hair
+  { hat: 'visor',    tone: '#f5cba7', eyes: 'normal' }, // 3 GreenGuy — visor cap
+  { hat: 'antenna',  tone: '#d0e8f0', eyes: 'robot'  }, // 4 YelloBot — robot antenna
+  { hat: 'pigtails', tone: '#f9d4c4', eyes: 'normal' }, // 5 PinkPro  — pigtails
+  { hat: 'beanie',   tone: '#f5cba7', eyes: 'normal' }, // 6 CyanPro  — beanie
+];
 
 // ── NPC wander waypoints (all inside playable area) ─────────
 const WPS = [
@@ -176,6 +187,7 @@ function initGame() {
       id: i,
       name: NAMES[i],
       color: COLORS[i],
+      skin: i,
       x: 280 + i * 40,
       y: 290,
       role: 'survivor',
@@ -374,10 +386,9 @@ function checkInteract(now) {
     }
   }
 
-  // Survivor: can report a nearby unreported body
+  // Survivor: can report any nearby body
   if (!itarget) {
     for (const b of bodies) {
-      if (b.reported) continue;
       if (dist(me, b) < REP_R) {
         itarget = { type: 'report', ref: b };
         break;
@@ -833,13 +844,13 @@ function drawAllPlayers() {
       }
     }
 
-    drawNoob(p.x, p.y, p.color, p.name, p.facing, isYou, showKiller && isKiller);
+    drawNoob(p.x, p.y, p.color, p.name, p.facing, isYou, showKiller && isKiller, p.skin);
   }
 }
 
 // ── Roblox-style noob character ─────────────────────────────
-function drawNoob(x, y, color, name, facing, isYou, isKiller) {
-  drawNoobAt(ctx, x, y, color, isYou, isKiller, facing !== -1);
+function drawNoob(x, y, color, name, facing, isYou, isKiller, skinId = 0) {
+  drawNoobAt(ctx, x, y, color, isYou, isKiller, facing !== -1, skinId);
   // Name label
   const label = isYou ? '★ YOU' : (isKiller ? '🔪 ' + name : name);
   ctx.font = 'bold 10px monospace';
@@ -854,9 +865,10 @@ function drawNoob(x, y, color, name, facing, isYou, isKiller) {
   ctx.fillText(label, x, y - 38);
 }
 
-function drawNoobAt(c, x, y, color, isYou, isKiller, facingRight) {
+function drawNoobAt(c, x, y, color, isYou, isKiller, facingRight, skinId = 0) {
+  const sk = SKINS[skinId % SKINS.length];
   const dc   = darkColor(color);
-  const SKIN = '#f5cba7';
+  const SKIN = sk.tone;
 
   // Shadow
   c.fillStyle = 'rgba(0,0,0,0.28)';
@@ -888,23 +900,27 @@ function drawNoobAt(c, x, y, color, isYou, isKiller, facingRight) {
   c.fillRect(x - 19, y + 2, 7, 5);
   c.fillRect(x + 12, y + 2, 7, 5);
 
-  // Head
-  c.fillStyle = SKIN;
+  // Head (robot gets metallic tint)
+  c.fillStyle = sk.hat === 'antenna' ? '#c8dce8' : SKIN;
   c.fillRect(x - 11, y - 30, 22, 18);
 
   // Eyes
-  c.fillStyle = '#222';
-  if (facingRight) {
+  if (sk.eyes === 'robot') {
+    c.fillStyle = '#00ffcc';
+    c.fillRect(x - 7, y - 25, 5, 5);
+    c.fillRect(x + 2, y - 25, 5, 5);
+  } else if (facingRight) {
+    c.fillStyle = '#222';
     c.fillRect(x - 4, y - 25, 4, 4);
     c.fillRect(x + 4, y - 25, 4, 4);
   } else {
+    c.fillStyle = '#222';
     c.fillRect(x - 8, y - 25, 4, 4);
     c.fillRect(x,     y - 25, 4, 4);
   }
 
-  // Hair / hat
-  c.fillStyle = dc;
-  c.fillRect(x - 11, y - 34, 22, 7);
+  // Hat / hair (unique per skin)
+  drawHat(c, x, y, dc, color, sk.hat);
 
   // Killer knife icon on body
   if (isKiller) {
@@ -919,6 +935,73 @@ function drawNoobAt(c, x, y, color, isYou, isKiller, facingRight) {
     c.font = 'bold 10px monospace';
     c.textAlign = 'center';
     c.fillText('★', x, y - 12);
+  }
+}
+
+function drawHat(c, x, y, dc, color, hat) {
+  switch (hat) {
+    case 'cap':
+      // Flat cap with front brim
+      c.fillStyle = dc;
+      c.fillRect(x - 11, y - 34, 22, 7);
+      c.fillRect(x - 11, y - 28, 28, 4);
+      break;
+
+    case 'tophat':
+      // Tall top hat
+      c.fillStyle = dc;
+      c.fillRect(x - 14, y - 31, 28, 4);  // wide brim
+      c.fillRect(x - 8,  y - 52, 16, 22); // tall crown
+      break;
+
+    case 'spiky':
+      // Spiky punk hair
+      c.fillStyle = dc;
+      c.fillRect(x - 11, y - 34, 22, 6);  // base
+      for (let i = 0; i < 4; i++) {
+        const sx = x - 8 + i * 6;
+        c.beginPath();
+        c.moveTo(sx, y - 34);
+        c.lineTo(sx + 3, y - 46);
+        c.lineTo(sx + 6, y - 34);
+        c.fill();
+      }
+      break;
+
+    case 'visor':
+      // Cap with dark visor brim
+      c.fillStyle = dc;
+      c.fillRect(x - 11, y - 34, 22, 7);
+      c.fillStyle = '#1a1a1a';
+      c.fillRect(x - 11, y - 28, 30, 5);  // dark visor
+      break;
+
+    case 'antenna':
+      // Robot antenna (no hat, just pole + orb)
+      c.fillStyle = '#9ab';
+      c.fillRect(x - 1, y - 44, 3, 15);
+      c.fillStyle = '#ff4444';
+      c.beginPath(); c.arc(x, y - 46, 5, 0, Math.PI * 2); c.fill();
+      break;
+
+    case 'pigtails':
+      // Hair with side pigtails
+      c.fillStyle = dc;
+      c.fillRect(x - 11, y - 36, 22, 8);  // top hair
+      c.fillRect(x - 19, y - 32, 9, 14);  // left pigtail
+      c.fillRect(x + 10, y - 32, 9, 14);  // right pigtail
+      break;
+
+    case 'beanie':
+      // Rounded beanie with colour stripe
+      c.fillStyle = dc;
+      c.beginPath();
+      c.arc(x, y - 34, 12, Math.PI, 0);
+      c.fill();
+      c.fillRect(x - 12, y - 34, 24, 6);
+      c.fillStyle = color;
+      c.fillRect(x - 12, y - 34, 24, 4);  // colour stripe
+      break;
   }
 }
 

@@ -723,9 +723,11 @@
   /* ─── Data ─── */
   async function loadHabits() {
     try {
-      const snap = await db.collection('users').doc(uid).collection('habits')
-        .where('active', '==', true).orderBy('order').get();
-      habits = snap.docs.map(d => ({ id: d.id, ...d.data() }));
+      const snap = await db.collection('users').doc(uid).collection('habits').get();
+      habits = snap.docs
+        .map(d => ({ id: d.id, ...d.data() }))
+        .filter(h => h.active !== false)
+        .sort((a, b) => (a.order ?? 0) - (b.order ?? 0));
     } catch (e) { habits = []; }
   }
 

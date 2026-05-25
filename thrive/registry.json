@@ -1,1 +1,10 @@
-[]
+[
+  {
+    "id": "habits",
+    "path": "habits/",
+    "title": "Habit Tracker",
+    "description": "Track your daily habits, write a journal, and see your progress each week and month.",
+    "emoji": "✅",
+    "color": "#10b981"
+  }
+]

@@ -1099,7 +1099,7 @@
   $('btn-month-next').onclick = () => { if (monthOffset < 0) { monthOffset++; renderMonth(); } };
 
   // Add habit modal (triggered from settings)
-  $('btn-settings-add-habit').onclick = () => { buildEmojiGrid(); sh('modal-habit'); };
+  $('btn-settings-add-habit').onclick = () => { hd('modal-settings'); buildEmojiGrid(); sh('modal-habit'); };
   $('btn-habit-save').onclick  = addHabit;
   $('btn-habit-cancel').onclick = () => hd('modal-habit');
   $('habit-name-in').addEventListener('keydown', e => { if (e.key === 'Enter') addHabit(); });

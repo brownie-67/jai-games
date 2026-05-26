@@ -403,6 +403,35 @@
       font-weight: 700; font-size: 0.97rem;
     }
 
+    /* Week cell interactive */
+    .wcell.clickable { cursor: pointer; transition: transform 0.12s; }
+    .wcell.clickable:hover { transform: scale(1.18); opacity: 0.85; }
+
+    /* Month day interactive */
+    .mday:not(.mday-empty):not(.mday-future) { cursor: pointer; transition: opacity 0.12s; }
+    .mday:not(.mday-empty):not(.mday-future):hover { opacity: 0.8; }
+    .mday-selected { outline: 2px solid var(--thrive-accent) !important; outline-offset: -2px; }
+
+    /* Month detail panel */
+    #month-detail { margin-top: 16px; }
+    .mdetail-title {
+      font-size: 0.8rem; font-weight: 700;
+      color: var(--thrive-accent); margin-bottom: 10px;
+      text-transform: uppercase; letter-spacing: 0.6px;
+    }
+    .mdetail-empty { color: var(--text-muted); font-size: 0.88rem; }
+    .mdetail-row {
+      display: flex; align-items: center; gap: 10px;
+      padding: 8px 10px; border-radius: 8px; margin-bottom: 5px;
+    }
+    .mdetail-row.done { background: rgba(16,185,129,0.1); }
+    .mdetail-row.miss { background: rgba(255,255,255,0.03); }
+    .mdetail-emoji { font-size: 1.05rem; }
+    .mdetail-name  { flex: 1; font-size: 0.9rem; color: var(--text); }
+    .mdetail-check { font-size: 0.95rem; }
+    .mdetail-row.done .mdetail-check { color: var(--thrive-accent); font-weight: 700; }
+    .mdetail-row.miss .mdetail-check { color: var(--text-muted); }
+
     /* Emoji picker */
     #emoji-grid {
       display: grid; grid-template-columns: repeat(6, 1fr);
@@ -510,6 +539,7 @@
         </div>
         <div id="month-grid"></div>
         <div id="month-legend"></div>
+        <div id="month-detail"></div>
       </div>
 
     </main>
@@ -637,12 +667,13 @@
   ];
 
   /* ─── State ─── */
-  let uid          = null;
-  let username     = '';
-  let habits       = [];
-  let todayLogs    = {};
-  let weekOffset   = 0;
-  let monthOffset  = 0;
+  let uid            = null;
+  let username       = '';
+  let habits         = [];
+  let todayLogs      = {};
+  let weekOffset     = 0;
+  let monthOffset    = 0;
+  let cachedMonthLogs = {};
   let pickedEmoji    = EMOJIS[0];
   let journalTimer   = null;
   let habitToDelete  = null;
@@ -914,13 +945,14 @@
       habits.forEach(h => {
         html += `<tr><td class="habit-col">${h.emoji} ${h.name}</td>`;
         days.forEach(d => {
-          const ds       = dStr(d);
-          const isToday  = ds === todayS;
-          const isFuture = d > now && ds !== todayS;
-          const isDone   = logs[ds] && logs[ds][h.id];
-          const isPast   = !isFuture && !isDone;
+          const ds        = dStr(d);
+          const isToday   = ds === todayS;
+          const isFuture  = d > now && ds !== todayS;
+          const isDone    = logs[ds] && logs[ds][h.id];
+          const clickable = !isFuture;
           html += `<td class="${isToday ? 't-col' : ''}">
-            <span class="wcell ${isDone ? 'done' : isFuture ? 'future' : 'miss'}">
+            <span class="wcell ${isDone ? 'done' : isFuture ? 'future' : 'miss'} ${clickable ? 'clickable' : ''}"
+              ${clickable ? `data-habit="${h.id}" data-date="${ds}"` : ''}>
               ${isDone ? '✓' : isFuture ? '' : '–'}
             </span>
           </td>`;
@@ -969,11 +1001,13 @@
       }
 
       html += `<div class="mday ${isToday ? 'mday-today' : ''} ${isFuture ? 'mday-future' : ''}"
-        style="background:${bg}" title="${doneN}/${total} habits done on ${ds}">
+        data-date="${ds}" style="background:${bg}" title="${doneN}/${total} habits done on ${ds}">
         ${d.getDate()}
       </div>`;
     });
 
+    cachedMonthLogs = logs;
+    $('month-detail').innerHTML = '';
     $('month-grid').innerHTML   = html;
     $('month-label').textContent = fmtMonth(info.year, info.month);
     $('btn-month-next').disabled = monthOffset >= 0;
@@ -985,6 +1019,45 @@
         ${Math.round(p * 100)}%
       </span>`;
     }).join('');
+  }
+
+  /* ─── Week cell toggle ─── */
+  async function toggleWeekCell(habitId, dateStr) {
+    try {
+      const ref  = db.collection('users').doc(uid).collection('logs').doc(dateStr);
+      const snap = await ref.get();
+      const data = snap.exists ? snap.data() : {};
+      if (data[habitId]) { delete data[habitId]; } else { data[habitId] = true; }
+      await ref.set(data);
+      if (dateStr === todayStr()) { todayLogs = data; renderToday(); }
+      await renderWeek();
+    } catch (e) {}
+  }
+
+  /* ─── Month detail panel ─── */
+  function renderMonthDetail(dateStr) {
+    document.querySelectorAll('.mday-selected').forEach(el => el.classList.remove('mday-selected'));
+    const sel = document.querySelector(`.mday[data-date="${dateStr}"]`);
+    if (sel) sel.classList.add('mday-selected');
+
+    const dayLogs = cachedMonthLogs[dateStr] || {};
+    const done    = habits.filter(h => dayLogs[h.id]);
+    const missed  = habits.filter(h => !dayLogs[h.id]);
+
+    const d     = new Date(dateStr + 'T12:00:00');
+    const label = d.toLocaleDateString('en', { weekday: 'long', month: 'long', day: 'numeric' });
+
+    let html = `<div class="mdetail-title">${label}</div>`;
+    if (!habits.length) {
+      html += `<p class="mdetail-empty">No habits tracked yet.</p>`;
+    } else {
+      done.forEach(h   => { html += `<div class="mdetail-row done"><span class="mdetail-emoji">${h.emoji}</span><span class="mdetail-name">${h.name}</span><span class="mdetail-check">✓</span></div>`; });
+      missed.forEach(h => { html += `<div class="mdetail-row miss"><span class="mdetail-emoji">${h.emoji}</span><span class="mdetail-name">${h.name}</span><span class="mdetail-check">○</span></div>`; });
+    }
+
+    const panel = $('month-detail');
+    panel.innerHTML = html;
+    panel.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
   }
 
   /* ─── Add Habit ─── */
@@ -1100,10 +1173,20 @@
   // Week
   $('btn-week-prev').onclick = () => { weekOffset--; renderWeek(); };
   $('btn-week-next').onclick = () => { if (weekOffset < 0) { weekOffset++; renderWeek(); } };
+  $('week-grid-wrap').addEventListener('click', async e => {
+    const span = e.target.closest('.wcell.clickable');
+    if (!span || !uid) return;
+    await toggleWeekCell(span.dataset.habit, span.dataset.date);
+  });
 
   // Month
   $('btn-month-prev').onclick = () => { monthOffset--; renderMonth(); };
   $('btn-month-next').onclick = () => { if (monthOffset < 0) { monthOffset++; renderMonth(); } };
+  $('month-grid').addEventListener('click', e => {
+    const day = e.target.closest('.mday:not(.mday-empty):not(.mday-future)');
+    if (!day || !day.dataset.date) return;
+    renderMonthDetail(day.dataset.date);
+  });
 
   // Add habit modal (triggered from settings)
   $('btn-settings-add-habit').onclick = () => { hd('modal-settings'); buildEmojiGrid(); sh('modal-habit'); };

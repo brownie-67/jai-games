@@ -362,6 +362,35 @@
     .status-ok { background: rgba(16,185,129,0.12); color: #6ee7b7; }
     .status-err { background: rgba(239,68,68,0.12); color: #fca5a5; }
 
+    /* Delete button on habit rows */
+    .habit-del {
+      background: none; border: none;
+      font-size: 1rem; padding: 4px 6px;
+      opacity: 0; color: var(--text-muted);
+      border-radius: 6px; flex-shrink: 0;
+      transition: opacity 0.15s, color 0.15s;
+    }
+    .habit-item:hover .habit-del { opacity: 1; }
+    .habit-del:hover { color: #fca5a5; }
+
+    /* Confirm modal (centred, not bottom-anchored) */
+    #modal-delete { align-items: center; padding: 24px; }
+    .confirm-card {
+      background: var(--surface2);
+      border-radius: 16px; padding: 28px 24px;
+      width: 100%; max-width: 320px; text-align: center;
+    }
+    .confirm-card .confirm-icon { font-size: 2.2rem; margin-bottom: 10px; }
+    .confirm-card h3 { font-size: 1.1rem; margin-bottom: 8px; }
+    .confirm-card p  { font-size: 0.88rem; color: var(--text-muted); margin-bottom: 22px; line-height: 1.5; }
+    .btn-danger-confirm {
+      flex: 1; padding: 13px;
+      background: rgba(239,68,68,0.15);
+      border: 1px solid rgba(239,68,68,0.3);
+      border-radius: 10px; color: #fca5a5;
+      font-weight: 700; font-size: 0.97rem;
+    }
+
     /* Emoji picker */
     #emoji-grid {
       display: grid; grid-template-columns: repeat(6, 1fr);
@@ -521,6 +550,19 @@
     </div>
   </div>
 
+  <!-- ─── Delete Confirm Modal ─── -->
+  <div id="modal-delete" class="modal hidden">
+    <div class="confirm-card">
+      <div class="confirm-icon">🗑️</div>
+      <h3>Remove Habit?</h3>
+      <p id="confirm-habit-name"></p>
+      <div class="modal-row">
+        <button class="btn-danger-confirm" id="btn-confirm-delete">Remove</button>
+        <button class="btn-ghost" id="btn-cancel-delete">Cancel</button>
+      </div>
+    </div>
+  </div>
+
   <!-- Firebase SDKs (compat) -->
   <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
@@ -585,8 +627,9 @@
   let todayLogs    = {};
   let weekOffset   = 0;
   let monthOffset  = 0;
-  let pickedEmoji  = EMOJIS[0];
-  let journalTimer = null;
+  let pickedEmoji    = EMOJIS[0];
+  let journalTimer   = null;
+  let habitToDelete  = null;
 
   /* ─── Date Helpers ─── */
   function dStr(d) {
@@ -788,12 +831,22 @@
            id="hi-${h.id}" data-id="${h.id}">
         <span class="habit-emoji">${h.emoji}</span>
         <span class="habit-name">${h.name}</span>
+        <button class="habit-del" data-del="${h.id}" data-name="${h.name}" title="Remove habit">🗑</button>
         <span class="habit-check">${todayLogs[h.id] ? '✓' : ''}</span>
       </div>
     `).join('');
 
     document.querySelectorAll('.habit-item').forEach(el => {
       el.addEventListener('click', () => toggleHabit(el.dataset.id));
+    });
+
+    document.querySelectorAll('.habit-del').forEach(btn => {
+      btn.addEventListener('click', e => {
+        e.stopPropagation();
+        habitToDelete = { id: btn.dataset.del, name: btn.dataset.name };
+        $('confirm-habit-name').textContent = `"${btn.dataset.name}" will be permanently removed.`;
+        sh('modal-delete');
+      });
     });
   }
 
@@ -958,6 +1011,19 @@
     } catch (e) {}
   }
 
+  /* ─── Delete Habit ─── */
+  async function confirmDeleteHabit() {
+    if (!habitToDelete) return;
+    const { id, name } = habitToDelete;
+    try {
+      await db.collection('users').doc(uid).collection('habits').doc(id).delete();
+      habits = habits.filter(h => h.id !== id);
+      hd('modal-delete');
+      habitToDelete = null;
+      renderToday();
+    } catch (e) {}
+  }
+
   /* ─── Settings ─── */
   async function changePassword() {
     const np  = $('pw-new').value;
@@ -1022,10 +1088,14 @@
     await auth.signOut();
   };
 
+  // Delete confirm
+  $('btn-confirm-delete').onclick = confirmDeleteHabit;
+  $('btn-cancel-delete').onclick  = () => { hd('modal-delete'); habitToDelete = null; };
+
   // Close modals by clicking backdrop
-  ['modal-habit', 'modal-settings'].forEach(id => {
+  ['modal-habit', 'modal-settings', 'modal-delete'].forEach(id => {
     $(id).addEventListener('click', function(e) {
-      if (e.target === this) this.classList.add('hidden');
+      if (e.target === this) { this.classList.add('hidden'); habitToDelete = null; }
     });
   });
   </script>

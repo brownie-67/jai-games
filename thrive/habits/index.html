@@ -362,16 +362,21 @@
     .status-ok { background: rgba(16,185,129,0.12); color: #6ee7b7; }
     .status-err { background: rgba(239,68,68,0.12); color: #fca5a5; }
 
-    /* Delete button on habit rows */
-    .habit-del {
-      background: none; border: none;
-      font-size: 1rem; padding: 4px 6px;
-      opacity: 0; color: var(--text-muted);
-      border-radius: 6px; flex-shrink: 0;
-      transition: opacity 0.15s, color 0.15s;
+    /* Settings — manage habits list */
+    .sh-item {
+      display: flex; align-items: center; gap: 12px;
+      padding: 10px 12px; background: var(--bg);
+      border-radius: 9px; margin-bottom: 7px;
     }
-    .habit-item:hover .habit-del { opacity: 1; }
-    .habit-del:hover { color: #fca5a5; }
+    .sh-emoji { font-size: 1.2rem; }
+    .sh-name  { flex: 1; font-size: 0.93rem; color: var(--text); }
+    .sh-del {
+      background: none; border: none;
+      font-size: 0.95rem; color: var(--text-muted);
+      padding: 4px 8px; border-radius: 6px;
+      transition: color 0.15s;
+    }
+    .sh-del:hover { color: #fca5a5; }
 
     /* Confirm modal (centred, not bottom-anchored) */
     #modal-delete { align-items: center; padding: 24px; }
@@ -469,7 +474,6 @@
           </div>
         </div>
         <div id="habit-list"></div>
-        <button id="btn-add-habit">＋ Add a Habit</button>
         <div id="journal-section">
           <h3>📝 Today's Journal</h3>
           <textarea id="journal-text" placeholder="How was your day? What's on your mind?"></textarea>
@@ -534,6 +538,11 @@
     <div class="modal-card">
       <h3>⚙️ Settings</h3>
       <div class="settings-meta">Logged in as <strong id="s-username"></strong></div>
+
+      <hr class="settings-divider" />
+      <div class="settings-section-label">My Habits</div>
+      <div id="settings-habit-list"></div>
+      <button class="btn-primary" id="btn-settings-add-habit" style="width:100%;margin-top:8px">＋ Add a Habit</button>
 
       <hr class="settings-divider" />
       <div class="settings-section-label">Change Password</div>
@@ -751,11 +760,11 @@
     $('header-date').textContent     = fmtDate(new Date());
     $('s-username').textContent      = username;
 
-    await loadHabits();
-    if (habits.length === 0) {
+    const profileSnap = await db.collection('users').doc(uid).get();
+    if (!profileSnap.exists) {
       await initDefaultHabits();
-      await loadHabits();
     }
+    await loadHabits();
 
     await loadTodayLogs();
     await loadJournal();
@@ -776,6 +785,7 @@
 
   async function initDefaultHabits() {
     const batch = db.batch();
+    batch.set(db.collection('users').doc(uid), { initialized: true, username });
     DEFAULT_HABITS.forEach(h => {
       const ref = db.collection('users').doc(uid).collection('habits').doc(h.id);
       batch.set(ref, { name: h.name, emoji: h.emoji, order: h.order, active: true });
@@ -821,7 +831,7 @@
     if (!total) {
       $('habit-list').innerHTML =
         `<p style="text-align:center;color:var(--text-muted);padding:30px 0;font-size:0.9rem">
-           No habits yet — tap the button below to add one!
+           No habits yet — open ⚙️ Settings to add some!
          </p>`;
       return;
     }
@@ -831,22 +841,12 @@
            id="hi-${h.id}" data-id="${h.id}">
         <span class="habit-emoji">${h.emoji}</span>
         <span class="habit-name">${h.name}</span>
-        <button class="habit-del" data-del="${h.id}" data-name="${h.name}" title="Remove habit">🗑</button>
         <span class="habit-check">${todayLogs[h.id] ? '✓' : ''}</span>
       </div>
     `).join('');
 
     document.querySelectorAll('.habit-item').forEach(el => {
       el.addEventListener('click', () => toggleHabit(el.dataset.id));
-    });
-
-    document.querySelectorAll('.habit-del').forEach(btn => {
-      btn.addEventListener('click', e => {
-        e.stopPropagation();
-        habitToDelete = { id: btn.dataset.del, name: btn.dataset.name };
-        $('confirm-habit-name').textContent = `"${btn.dataset.name}" will be permanently removed.`;
-        sh('modal-delete');
-      });
     });
   }
 
@@ -1007,19 +1007,44 @@
       habits.push({ id, ...data });
       $('habit-name-in').value = '';
       hd('modal-habit');
+      renderSettingsHabits();
       renderToday();
     } catch (e) {}
+  }
+
+  /* ─── Settings: Manage Habits ─── */
+  function renderSettingsHabits() {
+    const list = $('settings-habit-list');
+    if (!habits.length) {
+      list.innerHTML = `<p style="color:var(--text-muted);font-size:0.88rem;text-align:center;padding:14px 0">No habits yet. Add one below!</p>`;
+      return;
+    }
+    list.innerHTML = habits.map(h => `
+      <div class="sh-item">
+        <span class="sh-emoji">${h.emoji}</span>
+        <span class="sh-name">${h.name}</span>
+        <button class="sh-del" data-del="${h.id}" data-name="${h.name}" title="Remove">🗑</button>
+      </div>
+    `).join('');
+    document.querySelectorAll('.sh-del').forEach(btn => {
+      btn.addEventListener('click', () => {
+        habitToDelete = { id: btn.dataset.del, name: btn.dataset.name };
+        $('confirm-habit-name').textContent = `"${btn.dataset.name}" will be permanently removed.`;
+        sh('modal-delete');
+      });
+    });
   }
 
   /* ─── Delete Habit ─── */
   async function confirmDeleteHabit() {
     if (!habitToDelete) return;
-    const { id, name } = habitToDelete;
+    const { id } = habitToDelete;
     try {
       await db.collection('users').doc(uid).collection('habits').doc(id).delete();
       habits = habits.filter(h => h.id !== id);
       hd('modal-delete');
       habitToDelete = null;
+      renderSettingsHabits();
       renderToday();
     } catch (e) {}
   }
@@ -1073,14 +1098,14 @@
   $('btn-month-prev').onclick = () => { monthOffset--; renderMonth(); };
   $('btn-month-next').onclick = () => { if (monthOffset < 0) { monthOffset++; renderMonth(); } };
 
-  // Add habit modal
-  $('btn-add-habit').onclick   = () => { buildEmojiGrid(); sh('modal-habit'); };
+  // Add habit modal (triggered from settings)
+  $('btn-settings-add-habit').onclick = () => { buildEmojiGrid(); sh('modal-habit'); };
   $('btn-habit-save').onclick  = addHabit;
   $('btn-habit-cancel').onclick = () => hd('modal-habit');
   $('habit-name-in').addEventListener('keydown', e => { if (e.key === 'Enter') addHabit(); });
 
   // Settings modal
-  $('btn-settings-open').onclick  = () => sh('modal-settings');
+  $('btn-settings-open').onclick  = () => { renderSettingsHabits(); sh('modal-settings'); };
   $('btn-settings-close').onclick = () => hd('modal-settings');
   $('btn-change-pw').onclick      = changePassword;
   $('btn-logout').onclick = async () => {

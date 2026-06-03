@@ -431,6 +431,24 @@
     .mdetail-check { font-size: 0.95rem; }
     .mdetail-row.done .mdetail-check { color: var(--thrive-accent); font-weight: 700; }
     .mdetail-row.miss .mdetail-check { color: var(--text-muted); }
+    .mdetail-journal {
+      margin-top: 14px; padding: 12px 14px;
+      background: rgba(255,255,255,0.04);
+      border-left: 3px solid var(--thrive-accent2);
+      border-radius: 0 8px 8px 0;
+    }
+    .mdetail-journal-label {
+      font-size: 0.75rem; font-weight: 700;
+      color: var(--thrive-accent2); text-transform: uppercase;
+      letter-spacing: 0.6px; margin-bottom: 6px;
+    }
+    .mdetail-journal-text {
+      font-size: 0.88rem; color: var(--text);
+      line-height: 1.55; white-space: pre-wrap;
+    }
+    .mdetail-journal-empty {
+      font-size: 0.85rem; color: var(--text-muted); font-style: italic;
+    }
 
     /* Emoji picker */
     #emoji-grid {
@@ -1035,7 +1053,7 @@
   }
 
   /* ─── Month detail panel ─── */
-  function renderMonthDetail(dateStr) {
+  async function renderMonthDetail(dateStr) {
     document.querySelectorAll('.mday-selected').forEach(el => el.classList.remove('mday-selected'));
     const sel = document.querySelector(`.mday[data-date="${dateStr}"]`);
     if (sel) sel.classList.add('mday-selected');
@@ -1054,6 +1072,21 @@
       done.forEach(h   => { html += `<div class="mdetail-row done"><span class="mdetail-emoji">${h.emoji}</span><span class="mdetail-name">${h.name}</span><span class="mdetail-check">✓</span></div>`; });
       missed.forEach(h => { html += `<div class="mdetail-row miss"><span class="mdetail-emoji">${h.emoji}</span><span class="mdetail-name">${h.name}</span><span class="mdetail-check">○</span></div>`; });
     }
+
+    // Fetch journal for this date
+    let journalText = '';
+    try {
+      const snap = await db.collection('users').doc(uid).collection('journal').doc(dateStr).get();
+      if (snap.exists) journalText = (snap.data().text || '').trim();
+    } catch (e) {}
+
+    html += `<div class="mdetail-journal">
+      <div class="mdetail-journal-label">📝 Journal</div>
+      ${journalText
+        ? `<div class="mdetail-journal-text">${journalText.replace(/</g,'&lt;')}</div>`
+        : `<div class="mdetail-journal-empty">No journal entry for this day.</div>`
+      }
+    </div>`;
 
     const panel = $('month-detail');
     panel.innerHTML = html;

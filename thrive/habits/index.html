@@ -591,6 +591,32 @@
     .sh-area-unset { background: rgba(255,255,255,0.1); border: 1px dashed rgba(255,255,255,0.25) !important; }
     .sh-area-set   { border: 2px solid rgba(255,255,255,0.3) !important; }
 
+    /* ═══ Frequency picker ═══ */
+    .freq-picker-label { font-size: 0.75rem; color: var(--text-muted); margin-bottom: 8px; text-transform: uppercase; letter-spacing: 0.6px; font-weight: 700; }
+    .freq-pills { display: flex; gap: 6px; flex-wrap: wrap; margin-bottom: 14px; }
+    .freq-pill {
+      padding: 6px 13px; border-radius: 20px; font-size: 0.82rem; font-weight: 700;
+      border: 1px solid rgba(255,255,255,0.1);
+      background: rgba(255,255,255,0.04); color: var(--text-muted);
+      transition: all 0.15s;
+    }
+    .freq-pill:hover { border-color: rgba(255,255,255,0.22); color: var(--text); }
+    .freq-pill.sel { background: rgba(16,185,129,0.15); border-color: var(--thrive-accent); color: var(--thrive-accent); }
+
+    /* Frequency badge (settings list) */
+    .freq-badge {
+      font-size: 0.7rem; color: var(--text-muted);
+      background: rgba(255,255,255,0.06); border-radius: 5px;
+      padding: 2px 7px; flex-shrink: 0; white-space: nowrap;
+    }
+
+    /* Weekly progress on habit card */
+    .weekly-prog {
+      font-size: 0.72rem; color: var(--text-muted);
+      flex-shrink: 0; white-space: nowrap;
+    }
+    .weekly-prog.hit { color: var(--thrive-accent); font-weight: 700; }
+
     /* ═══ Balance bars (Month view) ═══ */
     #balance-section { margin-top: 18px; }
     .balance-title {
@@ -793,6 +819,8 @@
       <div id="habit-dup-msg" class="auth-error hidden" style="margin-bottom:4px">
         Already tracking a habit with this name.
       </div>
+      <div class="freq-picker-label">How often per week?</div>
+      <div class="freq-pills" id="freq-picker"></div>
       <div class="area-picker-label">Life Area</div>
       <div class="area-pills" id="area-picker"></div>
       <div class="modal-row">
@@ -855,10 +883,14 @@
     </div>
   </div>
 
-  <!-- ─── Area Edit Modal ─── -->
+  <!-- ─── Edit Habit Modal ─── -->
   <div id="modal-area-edit" class="modal hidden">
     <div class="modal-card" style="padding:22px 24px 36px">
-      <h3>🏷️ Set Life Area</h3>
+      <h3>✏️ Edit Habit</h3>
+      <div id="edit-habit-name" style="font-size:1rem;margin-bottom:16px;color:var(--text-muted)"></div>
+      <div class="freq-picker-label">How often per week?</div>
+      <div class="freq-pills" id="freq-edit-picker"></div>
+      <div class="area-picker-label">Life Area</div>
       <div class="area-pills" id="area-edit-picker"></div>
       <div class="modal-row">
         <button class="btn-primary" id="btn-area-save">Save</button>
@@ -1008,6 +1040,8 @@
   let cachedMonthLogs     = {};
   let pickedEmoji         = EMOJIS[0];
   let pickedArea          = '';
+  let pickedFrequency     = 7;
+  let editingFrequencyValue = 7;
   let journalTimer        = null;
   let monthJournalTimer   = null;
   let habitToDelete       = null;
@@ -1198,21 +1232,64 @@
     } catch (e) {}
   }
 
+  function getWeeklyDone(habitId) {
+    const now = new Date(); now.setHours(0, 0, 0, 0);
+    const dow = (now.getDay() + 6) % 7; // 0=Mon
+    let count = todayLogs[habitId] ? 1 : 0;
+    for (let i = 1; i <= dow; i++) {
+      const d = new Date(now); d.setDate(now.getDate() - i);
+      if ((recentLogs[dStr(d)] || {})[habitId]) count++;
+    }
+    return count;
+  }
+
+  function weekDoneForHabit(h, weekMondayDate) {
+    const now = new Date(); now.setHours(0, 0, 0, 0);
+    let count = 0;
+    for (let d = 0; d < 7; d++) {
+      const day = new Date(weekMondayDate); day.setDate(weekMondayDate.getDate() + d);
+      if (day > now) break;
+      const ds = dStr(day);
+      const done = ds === dStr(now) ? !!todayLogs[h.id] : !!((recentLogs[ds] || {})[h.id]);
+      if (done) count++;
+    }
+    return count;
+  }
+
   function computeStreaks() {
     const now = new Date(); now.setHours(0, 0, 0, 0);
     streaks = {};
     habits.forEach(h => {
-      let streak = 0;
-      let gapAllowed = !todayLogs[h.id];
-      for (let i = 0; i <= 101; i++) {
-        const d = new Date(now); d.setDate(now.getDate() - i);
-        const ds = dStr(d);
-        const done = i === 0 ? !!todayLogs[h.id] : !!((recentLogs[ds] || {})[h.id]);
-        if (done) { streak++; gapAllowed = false; }
-        else if (i === 0 && gapAllowed) { continue; }
-        else { break; }
+      const freq = h.frequency || 7;
+      const createdAt = h.createdAt || '2000-01-01';
+
+      if (freq === 7) {
+        // Day-based streak
+        let streak = 0;
+        let gapAllowed = !todayLogs[h.id];
+        for (let i = 0; i <= 101; i++) {
+          const d = new Date(now); d.setDate(now.getDate() - i);
+          const ds = dStr(d);
+          if (ds < createdAt) break;
+          const done = i === 0 ? !!todayLogs[h.id] : !!((recentLogs[ds] || {})[h.id]);
+          if (done) { streak++; gapAllowed = false; }
+          else if (i === 0 && gapAllowed) continue;
+          else break;
+        }
+        streaks[h.id] = streak;
+      } else {
+        // Week-based streak: consecutive weeks where done >= frequency
+        const dow = (now.getDay() + 6) % 7;
+        const monThis = new Date(now); monThis.setDate(now.getDate() - dow);
+        let streak = weekDoneForHabit(h, monThis) >= freq ? 1 : 0;
+        for (let w = 1; w <= 14; w++) {
+          const mon = new Date(monThis); mon.setDate(monThis.getDate() - w * 7);
+          if (dStr(mon) < createdAt) break;
+          if (weekDoneForHabit(h, mon) >= freq) streak++;
+          else break;
+        }
+        streaks[h.id] = streak;
       }
-      streaks[h.id] = streak;
     });
   }
 
@@ -1409,12 +1486,17 @@
 
     $('habit-list').innerHTML = habits.map(h => {
       const streak = streaks[h.id] || 0;
+      const freq   = h.frequency || 7;
+      const wDone  = freq < 7 ? getWeeklyDone(h.id) : 0;
+      const onTrack = freq < 7 && wDone >= freq;
+      const streakUnit = freq < 7 ? 'wk' : 'd';
       return `
         <div class="habit-item ${todayLogs[h.id] ? 'done' : ''}" id="hi-${h.id}" data-id="${h.id}">
           ${h.area ? `<span class="area-dot area-${h.area}"></span>` : ''}
           <span class="habit-emoji">${h.emoji}</span>
           <span class="habit-name">${h.name}</span>
-          ${streak >= 2 ? `<span class="habit-streak">🔥 ${streak}</span>` : ''}
+          ${freq < 7 ? `<span class="weekly-prog ${onTrack ? 'hit' : ''}">${wDone}/${freq} wk</span>` : ''}
+          ${streak >= 2 ? `<span class="habit-streak">🔥 ${streak}${streakUnit}</span>` : ''}
           <span class="habit-check">${todayLogs[h.id] ? '✓' : ''}</span>
         </div>`;
     }).join('');
@@ -1676,17 +1758,31 @@
     if (Date.now() < alertDismissedUntil) { hd('pattern-alert'); return; }
     const now = new Date(); now.setHours(0, 0, 0, 0);
     const alerts = [];
+    const dow = (now.getDay() + 6) % 7; // 0=Mon, days elapsed this week
     habits.forEach(h => {
       const createdAt = h.createdAt || '2000-01-01';
-      let missed = 0;
-      for (let i = 1; i <= 7; i++) {
-        const d = new Date(now); d.setDate(now.getDate() - i);
-        const ds = dStr(d);
-        if (ds < createdAt) break;
-        if (!((recentLogs[ds] || {})[h.id])) missed++;
-        else break;
+      const freq = h.frequency || 7;
+
+      if (freq === 7) {
+        // Daily: alert if missed 3+ consecutive days
+        let missed = 0;
+        for (let i = 1; i <= 7; i++) {
+          const d = new Date(now); d.setDate(now.getDate() - i);
+          const ds = dStr(d);
+          if (ds < createdAt) break;
+          if (!((recentLogs[ds] || {})[h.id])) missed++;
+          else break;
+        }
+        if (missed >= 3) alerts.push({ habit: h, msg: `${missed} days missed` });
+      } else {
+        // Non-daily: alert if can no longer hit weekly target
+        const wDone    = getWeeklyDone(h.id);
+        const daysLeft = 6 - dow; // remaining days after today
+        const remaining = freq - wDone;
+        if (remaining > 0 && remaining > daysLeft && dStr(now) >= createdAt) {
+          alerts.push({ habit: h, msg: `${wDone}/${freq} this week — can't hit target` });
+        }
       }
-      if (missed >= 3) alerts.push({ habit: h, missed });
     });
     const el = $('pattern-alert');
     if (!alerts.length) { hd('pattern-alert'); return; }
@@ -1696,7 +1792,7 @@
         <button class="alert-dismiss" id="btn-alert-dismiss">✕</button>
       </div>
       ${alerts.map(a =>
-        `<div class="alert-item">• ${a.habit.emoji} ${a.habit.name} — ${a.missed} day${a.missed > 1 ? 's' : ''} missed</div>`
+        `<div class="alert-item">• ${a.habit.emoji} ${a.habit.name} — ${a.msg}</div>`
       ).join('')}
     `;
     el.classList.remove('hidden');
@@ -1770,12 +1866,27 @@
     });
   }
 
-  /* ─── Area Edit (Settings) ─── */
+  /* ─── Edit Habit (Settings) ─── */
   function openAreaEdit(habitId) {
-    editingAreaHabitId = habitId;
-    editingAreaValue   = habits.find(h => h.id === habitId)?.area || '';
+    const habit = habits.find(h => h.id === habitId);
+    editingAreaHabitId      = habitId;
+    editingAreaValue        = habit?.area || '';
+    editingFrequencyValue   = habit?.frequency || 7;
+    $('edit-habit-name').textContent = `${habit?.emoji || ''} ${habit?.name || ''}`;
+    renderEditFrequencyPicker();
     renderAreaEditPicker();
     sh('modal-area-edit');
+  }
+
+  function renderEditFrequencyPicker() {
+    const labels = ['1×', '2×', '3×', '4×', '5×', '6×', 'Daily'];
+    $('freq-edit-picker').innerHTML = labels.map((lbl, i) => {
+      const val = i + 1;
+      return `<button class="freq-pill ${editingFrequencyValue === val ? 'sel' : ''}" data-freq="${val}">${lbl}</button>`;
+    }).join('');
+    document.querySelectorAll('#freq-edit-picker .freq-pill').forEach(btn => {
+      btn.addEventListener('click', () => { editingFrequencyValue = +btn.dataset.freq; renderEditFrequencyPicker(); });
+    });
   }
 
   function renderAreaEditPicker() {
@@ -1792,14 +1903,18 @@
     if (!editingAreaHabitId) return;
     const habit = habits.find(h => h.id === editingAreaHabitId);
     if (habit) {
-      habit.area = editingAreaValue || null;
+      habit.area      = editingAreaValue || null;
+      habit.frequency = editingFrequencyValue;
       try {
-        const update = editingAreaValue ? { area: editingAreaValue } : { area: firebase.firestore.FieldValue.delete() };
+        const update = { frequency: editingFrequencyValue };
+        if (editingAreaValue) update.area = editingAreaValue;
+        else update.area = firebase.firestore.FieldValue.delete();
         await db.collection('users').doc(uid).collection('habits').doc(editingAreaHabitId).update(update);
       } catch(e) {}
     }
     hd('modal-area-edit');
     editingAreaHabitId = null;
+    computeStreaks();
     renderSettingsHabits();
     renderToday();
   }
@@ -1819,6 +1934,18 @@
       });
     });
     buildAreaPicker();
+    buildFrequencyPicker();
+  }
+
+  function buildFrequencyPicker() {
+    const labels = ['1×', '2×', '3×', '4×', '5×', '6×', 'Daily'];
+    $('freq-picker').innerHTML = labels.map((lbl, i) => {
+      const val = i + 1;
+      return `<button class="freq-pill ${pickedFrequency === val ? 'sel' : ''}" data-freq="${val}">${lbl}</button>`;
+    }).join('');
+    document.querySelectorAll('#freq-picker .freq-pill').forEach(btn => {
+      btn.addEventListener('click', () => { pickedFrequency = +btn.dataset.freq; buildFrequencyPicker(); });
+    });
   }
 
   async function addHabit() {
@@ -1836,13 +1963,14 @@
     }
     const maxOrder = habits.length ? Math.max(...habits.map(h => h.order)) : -1;
     const id = 'c_' + Date.now();
-    const data = { name, emoji: pickedEmoji, order: maxOrder + 1, active: true, createdAt: todayStr() };
+    const data = { name, emoji: pickedEmoji, order: maxOrder + 1, active: true, createdAt: todayStr(), frequency: pickedFrequency };
     if (pickedArea) data.area = pickedArea;
     try {
       await db.collection('users').doc(uid).collection('habits').doc(id).set(data);
       habits.push({ id, ...data });
       $('habit-name-in').value = '';
-      pickedArea = '';
+      pickedArea      = '';
+      pickedFrequency = 7;
       hd('modal-habit');
       renderSettingsHabits();
       renderToday();
@@ -1856,17 +1984,21 @@
       list.innerHTML = `<p style="color:var(--text-muted);font-size:0.88rem;text-align:center;padding:14px 0">No habits yet. Add one below!</p>`;
       return;
     }
-    list.innerHTML = habits.map(h => `
-      <div class="sh-item">
-        <span class="sh-emoji">${h.emoji}</span>
-        <span class="sh-name">${h.name}</span>
-        <button class="sh-area-btn ${h.area ? `sh-area-set area-${h.area}` : 'sh-area-unset'}"
-          data-areaid="${h.id}" title="Set life area"></button>
-        <button class="sh-del" data-del="${h.id}" data-name="${h.name}" title="Remove">🗑</button>
-      </div>
-    `).join('');
+    list.innerHTML = habits.map(h => {
+      const freq = h.frequency || 7;
+      const freqLabel = freq === 7 ? 'Daily' : `${freq}×/wk`;
+      return `
+        <div class="sh-item">
+          <span class="sh-emoji">${h.emoji}</span>
+          <span class="sh-name">${h.name}</span>
+          <span class="freq-badge">${freqLabel}</span>
+          <button class="sh-area-btn ${h.area ? `sh-area-set area-${h.area}` : 'sh-area-unset'}"
+            data-editid="${h.id}" title="Edit habit"></button>
+          <button class="sh-del" data-del="${h.id}" data-name="${h.name}" title="Remove">🗑</button>
+        </div>`;
+    }).join('');
     document.querySelectorAll('.sh-area-btn').forEach(btn => {
-      btn.addEventListener('click', () => openAreaEdit(btn.dataset.areaid));
+      btn.addEventListener('click', () => openAreaEdit(btn.dataset.editid));
     });
     document.querySelectorAll('.sh-del').forEach(btn => {
       btn.addEventListener('click', () => {
@@ -1970,7 +2102,7 @@
   });
 
   // Add habit modal (triggered from settings)
-  $('btn-settings-add-habit').onclick = () => { hd('modal-settings'); buildEmojiGrid(); sh('modal-habit'); };
+  $('btn-settings-add-habit').onclick = () => { hd('modal-settings'); pickedFrequency = 7; pickedArea = ''; buildEmojiGrid(); sh('modal-habit'); };
   $('btn-habit-save').onclick  = addHabit;
   $('btn-habit-cancel').onclick = () => hd('modal-habit');
   $('habit-name-in').addEventListener('keydown', e => { if (e.key === 'Enter') addHabit(); });

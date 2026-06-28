@@ -790,6 +790,9 @@
       <div id="emoji-grid"></div>
       <input class="modal-input" type="text" id="habit-name-in"
         placeholder="Habit name (e.g. Read 20 mins)" maxlength="40" />
+      <div id="habit-dup-msg" class="auth-error hidden" style="margin-bottom:4px">
+        Already tracking a habit with this name.
+      </div>
       <div class="area-picker-label">Life Area</div>
       <div class="area-pills" id="area-picker"></div>
       <div class="modal-row">
@@ -1821,6 +1824,16 @@
   async function addHabit() {
     const name = $('habit-name-in').value.trim();
     if (!name) { $('habit-name-in').focus(); return; }
+    const duplicate = habits.find(h => h.name.toLowerCase() === name.toLowerCase());
+    if (duplicate) {
+      $('habit-name-in').style.borderColor = 'rgba(239,68,68,0.6)';
+      $('habit-dup-msg').classList.remove('hidden');
+      setTimeout(() => {
+        $('habit-name-in').style.borderColor = '';
+        $('habit-dup-msg').classList.add('hidden');
+      }, 3000);
+      return;
+    }
     const maxOrder = habits.length ? Math.max(...habits.map(h => h.order)) : -1;
     const id = 'c_' + Date.now();
     const data = { name, emoji: pickedEmoji, order: maxOrder + 1, active: true, createdAt: todayStr() };

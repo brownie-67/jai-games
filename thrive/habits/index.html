@@ -513,6 +513,49 @@
       border-color: var(--thrive-accent);
       background: rgba(16,185,129,0.1);
     }
+
+    /* ═══ Summary ═══ */
+    .btn-summary {
+      width: 100%; padding: 12px;
+      background: rgba(16,185,129,0.08);
+      border: 1px solid rgba(16,185,129,0.2);
+      border-radius: 10px; color: var(--thrive-accent);
+      font-size: 0.92rem; font-weight: 600; margin-top: 16px;
+      transition: background 0.2s, border-color 0.2s;
+    }
+    .btn-summary:hover { background: rgba(16,185,129,0.16); border-color: rgba(16,185,129,0.4); }
+
+    .sum-period { font-size: 0.82rem; color: var(--text-muted); margin-bottom: 16px; }
+    .sum-overview {
+      background: rgba(255,255,255,0.03); border-radius: 10px;
+      padding: 14px 16px; margin-bottom: 20px;
+    }
+    .sum-pct { font-size: 2.2rem; font-weight: 800; color: var(--thrive-accent); line-height: 1; margin-bottom: 8px; }
+    .sum-pct-bar {
+      height: 6px; background: rgba(255,255,255,0.07);
+      border-radius: 4px; overflow: hidden; margin-bottom: 6px;
+    }
+    .sum-pct-fill { height: 100%; background: linear-gradient(90deg, #10b981, #06b6d4); border-radius: 4px; }
+    .sum-pct-label { font-size: 0.78rem; color: var(--text-muted); }
+    .sum-section-label {
+      font-size: 0.72rem; font-weight: 700; text-transform: uppercase;
+      letter-spacing: 0.8px; color: var(--text-muted); margin-bottom: 8px;
+    }
+    .sum-row {
+      display: flex; align-items: flex-start; gap: 10px;
+      padding: 9px 12px; background: rgba(255,255,255,0.03);
+      border-radius: 8px; margin-bottom: 6px;
+      font-size: 0.88rem; color: var(--text); line-height: 1.45;
+    }
+    .sum-icon { font-size: 1rem; flex-shrink: 0; }
+    .sum-empty { font-size: 0.85rem; color: var(--text-muted); font-style: italic; padding: 4px 0 8px; }
+    .sum-journal-quote {
+      font-size: 0.85rem; color: var(--text); line-height: 1.6;
+      padding: 12px 14px;
+      background: rgba(255,255,255,0.04);
+      border-left: 3px solid var(--thrive-accent2);
+      border-radius: 0 8px 8px 0; font-style: italic;
+    }
   </style>
 </head>
 <body>
@@ -592,6 +635,7 @@
         <div id="week-grid-wrap">
           <table id="week-table"></table>
         </div>
+        <button class="btn-summary" id="btn-week-summary">📊 Summarize this week</button>
       </div>
 
       <!-- MONTH -->
@@ -603,6 +647,7 @@
         </div>
         <div id="month-grid"></div>
         <div id="month-legend"></div>
+        <button class="btn-summary" id="btn-month-summary">📊 Summarize this month</button>
         <div id="month-detail"></div>
       </div>
 
@@ -670,6 +715,16 @@
         <button class="btn-danger-confirm" id="btn-confirm-delete">Remove</button>
         <button class="btn-ghost" id="btn-cancel-delete">Cancel</button>
       </div>
+    </div>
+  </div>
+
+  <!-- ─── Summary Modal ─── -->
+  <div id="modal-summary" class="modal hidden">
+    <div class="modal-card">
+      <h3 id="summary-title">📊 Summary</h3>
+      <div id="summary-body"></div>
+      <div style="height:16px"></div>
+      <button class="btn-ghost" id="btn-summary-close" style="width:100%">Close</button>
     </div>
   </div>
 
@@ -973,6 +1028,139 @@
       results[dStr(dates[i])] = snap.exists ? snap.data() : {};
     });
     return results;
+  }
+
+  async function fetchJournals(dates) {
+    const snaps = await Promise.all(
+      dates.map(d => db.collection('users').doc(uid).collection('journal').doc(dStr(d)).get())
+    );
+    const out = {};
+    snaps.forEach((s, i) => { out[dStr(dates[i])] = s.exists ? (s.data().text || '').trim() : ''; });
+    return out;
+  }
+
+  /* ─── Summary ─── */
+  async function openSummary(dates, periodLabel, titleText) {
+    $('summary-title').textContent = titleText;
+    $('summary-body').innerHTML =
+      '<p style="text-align:center;color:var(--text-muted);padding:24px 0">Crunching your data…</p>';
+    sh('modal-summary');
+
+    const todayS    = todayStr();
+    const pastDates = dates.filter(d => dStr(d) <= todayS);
+
+    if (!pastDates.length || !habits.length) {
+      $('summary-body').innerHTML =
+        '<p style="text-align:center;color:var(--text-muted);padding:24px 0">No data yet for this period.</p>';
+      return;
+    }
+
+    const [logs, journals] = await Promise.all([fetchLogs(pastDates), fetchJournals(pastDates)]);
+    const total = habits.length;
+
+    // Per-day stats
+    const dayStats = pastDates.map(d => {
+      const ds   = dStr(d);
+      const done = habits.filter(h => (logs[ds] || {})[h.id]).length;
+      return { d, ds, done };
+    });
+
+    const totalDone     = dayStats.reduce((s, x) => s + x.done, 0);
+    const totalPossible = dayStats.length * total;
+    const pct           = Math.round(totalDone / totalPossible * 100);
+
+    // Best / worst days
+    const bestDay  = dayStats.reduce((b, x) => x.done > b.done ? x : b, dayStats[0]);
+    const worstDay = dayStats.reduce((w, x) => x.done < w.done ? x : w, dayStats[0]);
+
+    // Per-habit completion counts
+    const habitRanked = habits.map(h => {
+      const doneDays = pastDates.filter(d => (logs[dStr(d)] || {})[h.id]).length;
+      return { ...h, doneDays };
+    }).sort((a, b) => b.doneDays - a.doneDays);
+
+    // Journal stats
+    const journaledDates     = pastDates.filter(d => journals[dStr(d)]);
+    const missedJournalDates = pastDates.filter(d => !journals[dStr(d)]);
+
+    // Last journal snippet (first line, ≤90 chars)
+    let lastSnippet = '';
+    for (let i = pastDates.length - 1; i >= 0; i--) {
+      const t = journals[dStr(pastDates[i])];
+      if (t) { lastSnippet = t.split('\n')[0].slice(0, 90); break; }
+    }
+
+    // Perfect-day streak
+    let maxStreak = 0, streak = 0;
+    dayStats.forEach(x => {
+      if (x.done === total) { streak++; maxStreak = Math.max(maxStreak, streak); }
+      else streak = 0;
+    });
+
+    // Build highlights
+    const hi = [];
+    if (habitRanked[0].doneDays > 0) {
+      const h = habitRanked[0];
+      hi.push(`<span class="sum-icon">⭐</span><span>Top habit: ${h.emoji} <strong>${h.name}</strong> — ${h.doneDays}/${pastDates.length} days</span>`);
+    }
+    if (bestDay.done > 0) {
+      const label = bestDay.d.toLocaleDateString('en-US', { weekday: 'long', month: 'short', day: 'numeric' });
+      hi.push(`<span class="sum-icon">🏆</span><span>Best day: <strong>${label}</strong> — ${bestDay.done}/${total} habits done</span>`);
+    }
+    if (maxStreak >= 2) {
+      hi.push(`<span class="sum-icon">🔥</span><span>Best streak: <strong>${maxStreak} days</strong> of full completion in a row</span>`);
+    }
+    if (journaledDates.length > 0) {
+      hi.push(`<span class="sum-icon">📝</span><span>Journaled <strong>${journaledDates.length}</strong> of ${pastDates.length} days</span>`);
+    }
+    if (pct === 100) {
+      hi.push(`<span class="sum-icon">🌟</span><span>Perfect period — every habit completed every day!</span>`);
+    }
+
+    // Build lowlights
+    const lo = [];
+    const bottomHabit = habitRanked[habitRanked.length - 1];
+    if (bottomHabit.doneDays < Math.ceil(pastDates.length * 0.5)) {
+      lo.push(`<span class="sum-icon">📉</span><span>Least consistent: ${bottomHabit.emoji} <strong>${bottomHabit.name}</strong> — only ${bottomHabit.doneDays}/${pastDates.length} days</span>`);
+    }
+    const missedAllDays = dayStats.filter(x => x.done === 0);
+    if (missedAllDays.length) {
+      const names = missedAllDays.map(x => x.d.toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric' })).join(', ');
+      lo.push(`<span class="sum-icon">😓</span><span>No habits logged: <strong>${names}</strong></span>`);
+    }
+    if (missedJournalDates.length === pastDates.length) {
+      lo.push(`<span class="sum-icon">📓</span><span>No journal entries this period</span>`);
+    } else if (missedJournalDates.length > 0) {
+      const names = missedJournalDates.map(x => x.toLocaleDateString('en-US', { weekday: 'short' })).join(', ');
+      lo.push(`<span class="sum-icon">📓</span><span>Missing journal: <strong>${names}</strong></span>`);
+    }
+
+    // Render
+    let html = `
+      <div class="sum-period">${periodLabel}</div>
+      <div class="sum-overview">
+        <div class="sum-pct">${pct}%</div>
+        <div class="sum-pct-bar"><div class="sum-pct-fill" style="width:${pct}%"></div></div>
+        <div class="sum-pct-label">${totalDone} of ${totalPossible} habits · ${pastDates.length} days tracked</div>
+      </div>
+      <div class="sum-section-label">✨ Highlights</div>
+      ${hi.length
+        ? hi.map(h => `<div class="sum-row">${h}</div>`).join('')
+        : '<div class="sum-empty">Keep going — highlights will show as you build consistency.</div>'}
+      <div class="sum-section-label" style="margin-top:16px">⚠️ Lowlights</div>
+      ${lo.length
+        ? lo.map(l => `<div class="sum-row">${l}</div>`).join('')
+        : '<div class="sum-empty">No significant lowlights — great period! 🎉</div>'}
+    `;
+
+    if (lastSnippet) {
+      html += `
+        <div class="sum-section-label" style="margin-top:16px">💭 Journal Snapshot</div>
+        <div class="sum-journal-quote">"${lastSnippet}${lastSnippet.length >= 90 ? '…' : ''}"</div>
+      `;
+    }
+
+    $('summary-body').innerHTML = html;
   }
 
   /* ─── Today View ─── */
@@ -1349,6 +1537,22 @@
   $('btn-habit-save').onclick  = addHabit;
   $('btn-habit-cancel').onclick = () => hd('modal-habit');
   $('habit-name-in').addEventListener('keydown', e => { if (e.key === 'Enter') addHabit(); });
+
+  // Summary
+  $('btn-week-summary').onclick = async () => {
+    const days = getWeekDates(weekOffset);
+    await openSummary(days, `${fmtShort(days[0])} – ${fmtShort(days[6])}`, '📊 Weekly Summary');
+  };
+  $('btn-month-summary').onclick = async () => {
+    const info = getMonthInfo(monthOffset);
+    const allDates = Array.from({ length: info.lastDay.getDate() }, (_, i) =>
+      new Date(info.year, info.month, i + 1));
+    await openSummary(allDates, fmtMonth(info.year, info.month), '📊 Monthly Summary');
+  };
+  $('btn-summary-close').onclick = () => hd('modal-summary');
+  $('modal-summary').addEventListener('click', function(e) {
+    if (e.target === this) hd('modal-summary');
+  });
 
   // Journal tips
   $('btn-journal-tips').onclick = () => sh('modal-journal-tips');

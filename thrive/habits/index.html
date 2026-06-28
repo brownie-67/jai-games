@@ -408,8 +408,8 @@
     .wcell.clickable:hover { transform: scale(1.18); opacity: 0.85; }
 
     /* Month day interactive */
-    .mday:not(.mday-empty):not(.mday-future) { cursor: pointer; transition: opacity 0.12s; }
-    .mday:not(.mday-empty):not(.mday-future):hover { opacity: 0.8; }
+    .mday:not(.mday-empty) { cursor: pointer; transition: opacity 0.12s; }
+    .mday:not(.mday-empty):hover { opacity: 0.85; }
     .mday-selected { outline: 2px solid var(--thrive-accent) !important; outline-offset: -2px; }
 
     /* Month detail panel */
@@ -448,6 +448,21 @@
     }
     .mdetail-journal-empty {
       font-size: 0.85rem; color: var(--text-muted); font-style: italic;
+    }
+    .mdetail-journal-input {
+      width: 100%; min-height: 100px;
+      background: var(--bg);
+      border: 1px solid rgba(255,255,255,0.08);
+      border-radius: 8px; color: var(--text);
+      font-size: 0.88rem; padding: 10px 12px;
+      font-family: var(--font); resize: vertical; line-height: 1.65;
+      margin-top: 2px; box-sizing: border-box;
+    }
+    .mdetail-journal-input:focus { outline: none; border-color: var(--thrive-accent); }
+    .mdetail-journal-saved { font-size: 0.78rem; color: var(--thrive-accent); margin-top: 5px; }
+    .mdetail-future-note {
+      font-size: 0.78rem; color: var(--text-muted);
+      margin-bottom: 10px; font-style: italic;
     }
 
     /* Emoji picker */
@@ -693,8 +708,9 @@
   let monthOffset    = 0;
   let cachedMonthLogs = {};
   let pickedEmoji    = EMOJIS[0];
-  let journalTimer   = null;
-  let habitToDelete  = null;
+  let journalTimer        = null;
+  let monthJournalTimer   = null;
+  let habitToDelete       = null;
 
   /* ─── Date Helpers ─── */
   function dStr(d) {
@@ -1058,15 +1074,19 @@
     const sel = document.querySelector(`.mday[data-date="${dateStr}"]`);
     if (sel) sel.classList.add('mday-selected');
 
-    const dayLogs = cachedMonthLogs[dateStr] || {};
-    const done    = habits.filter(h => dayLogs[h.id]);
-    const missed  = habits.filter(h => !dayLogs[h.id]);
+    const isFuture = dateStr > todayStr();
+    const dayLogs  = cachedMonthLogs[dateStr] || {};
+    const done     = habits.filter(h => dayLogs[h.id]);
+    const missed   = habits.filter(h => !dayLogs[h.id]);
 
     const d     = new Date(dateStr + 'T12:00:00');
     const label = d.toLocaleDateString('en', { weekday: 'long', month: 'long', day: 'numeric' });
 
     let html = `<div class="mdetail-title">${label}</div>`;
-    if (!habits.length) {
+
+    if (isFuture) {
+      html += `<p class="mdetail-future-note">Future date — no habits logged yet.</p>`;
+    } else if (!habits.length) {
       html += `<p class="mdetail-empty">No habits tracked yet.</p>`;
     } else {
       done.forEach(h   => { html += `<div class="mdetail-row done"><span class="mdetail-emoji">${h.emoji}</span><span class="mdetail-name">${h.name}</span><span class="mdetail-check">✓</span></div>`; });
@@ -1077,19 +1097,37 @@
     let journalText = '';
     try {
       const snap = await db.collection('users').doc(uid).collection('journal').doc(dateStr).get();
-      if (snap.exists) journalText = (snap.data().text || '').trim();
+      if (snap.exists) journalText = (snap.data().text || '');
     } catch (e) {}
 
     html += `<div class="mdetail-journal">
       <div class="mdetail-journal-label">📝 Journal</div>
-      ${journalText
-        ? `<div class="mdetail-journal-text">${journalText.replace(/</g,'&lt;')}</div>`
-        : `<div class="mdetail-journal-empty">No journal entry for this day.</div>`
-      }
+      <textarea class="mdetail-journal-input" id="mdetail-journal-input"
+        placeholder="Write something about this day..."></textarea>
+      <div id="mdetail-journal-saved" class="mdetail-journal-saved hidden">Saved ✓</div>
     </div>`;
 
     const panel = $('month-detail');
     panel.innerHTML = html;
+
+    const textarea = $('mdetail-journal-input');
+    const savedMsg = $('mdetail-journal-saved');
+    textarea.value = journalText;
+
+    textarea.addEventListener('input', () => {
+      if (!uid) return;
+      clearTimeout(monthJournalTimer);
+      savedMsg.classList.add('hidden');
+      monthJournalTimer = setTimeout(async () => {
+        const text = textarea.value;
+        try {
+          await db.collection('users').doc(uid).collection('journal').doc(dateStr).set({ text });
+          savedMsg.classList.remove('hidden');
+          setTimeout(() => savedMsg.classList.add('hidden'), 2000);
+        } catch (e) {}
+      }, 800);
+    });
+
     panel.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
   }
 
@@ -1216,7 +1254,7 @@
   $('btn-month-prev').onclick = () => { monthOffset--; renderMonth(); };
   $('btn-month-next').onclick = () => { if (monthOffset < 0) { monthOffset++; renderMonth(); } };
   $('month-grid').addEventListener('click', e => {
-    const day = e.target.closest('.mday:not(.mday-empty):not(.mday-future)');
+    const day = e.target.closest('.mday:not(.mday-empty)');
     if (!day || !day.dataset.date) return;
     renderMonthDetail(day.dataset.date);
   });

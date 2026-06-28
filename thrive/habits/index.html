@@ -1674,10 +1674,13 @@
     const now = new Date(); now.setHours(0, 0, 0, 0);
     const alerts = [];
     habits.forEach(h => {
+      const createdAt = h.createdAt || '2000-01-01';
       let missed = 0;
       for (let i = 1; i <= 7; i++) {
         const d = new Date(now); d.setDate(now.getDate() - i);
-        if (!((recentLogs[dStr(d)] || {})[h.id])) missed++;
+        const ds = dStr(d);
+        if (ds < createdAt) break;
+        if (!((recentLogs[ds] || {})[h.id])) missed++;
         else break;
       }
       if (missed >= 3) alerts.push({ habit: h, missed });
@@ -1820,7 +1823,7 @@
     if (!name) { $('habit-name-in').focus(); return; }
     const maxOrder = habits.length ? Math.max(...habits.map(h => h.order)) : -1;
     const id = 'c_' + Date.now();
-    const data = { name, emoji: pickedEmoji, order: maxOrder + 1, active: true };
+    const data = { name, emoji: pickedEmoji, order: maxOrder + 1, active: true, createdAt: todayStr() };
     if (pickedArea) data.area = pickedArea;
     try {
       await db.collection('users').doc(uid).collection('habits').doc(id).set(data);

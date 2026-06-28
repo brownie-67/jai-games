@@ -514,6 +514,113 @@
       background: rgba(16,185,129,0.1);
     }
 
+    /* ═══ Mood Check-in ═══ */
+    #mood-checkin {
+      margin-bottom: 18px;
+      background: var(--surface); border-radius: 12px;
+      border: 1px solid rgba(255,255,255,0.05); padding: 14px 16px;
+    }
+    #mood-checkin p { font-size: 0.82rem; color: var(--text-muted); margin-bottom: 10px; }
+    .mood-btns { display: flex; gap: 8px; }
+    .mood-btn {
+      flex: 1; padding: 9px 6px;
+      background: rgba(255,255,255,0.04);
+      border: 1px solid rgba(255,255,255,0.08);
+      border-radius: 9px; color: var(--text-muted);
+      font-size: 0.82rem; transition: all 0.18s;
+    }
+    .mood-btn:hover { border-color: rgba(255,255,255,0.2); color: var(--text); }
+    .mood-btn.sel-low    { background: rgba(99,102,241,0.15);  border-color: rgba(99,102,241,0.5);  color: #c7d2fe; }
+    .mood-btn.sel-medium { background: rgba(251,191,36,0.12);  border-color: rgba(251,191,36,0.5);  color: #fcd34d; }
+    .mood-btn.sel-high   { background: rgba(16,185,129,0.14);  border-color: rgba(16,185,129,0.5);  color: var(--thrive-accent); }
+
+    /* ═══ Pattern Alert ═══ */
+    #pattern-alert {
+      background: rgba(251,191,36,0.07);
+      border: 1px solid rgba(251,191,36,0.25);
+      border-radius: 12px; padding: 12px 14px; margin-bottom: 14px;
+    }
+    .alert-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 7px; }
+    .alert-title  { font-size: 0.85rem; font-weight: 700; color: #fcd34d; }
+    .alert-dismiss {
+      background: none; border: none; color: var(--text-muted);
+      font-size: 1rem; padding: 2px 6px; border-radius: 5px; line-height: 1;
+    }
+    .alert-dismiss:hover { color: var(--text); }
+    .alert-item { font-size: 0.83rem; color: var(--text); padding: 2px 0; }
+
+    /* ═══ Streak badge ═══ */
+    .habit-streak {
+      font-size: 0.72rem; color: #fb923c;
+      background: rgba(251,146,60,0.13);
+      border-radius: 6px; padding: 2px 7px;
+      flex-shrink: 0; font-weight: 700; white-space: nowrap;
+    }
+
+    /* ═══ Life Area dot ═══ */
+    .area-dot { width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0; }
+    .area-mind    { background: #818cf8; }
+    .area-body    { background: #34d399; }
+    .area-skills  { background: #fb923c; }
+    .area-social  { background: #e879f9; }
+    .area-rest    { background: #22d3ee; }
+
+    /* ═══ Area picker (add habit modal) ═══ */
+    .area-picker-label { font-size: 0.75rem; color: var(--text-muted); margin-bottom: 8px; text-transform: uppercase; letter-spacing: 0.6px; font-weight: 700; }
+    .area-pills { display: flex; gap: 6px; flex-wrap: wrap; margin-bottom: 12px; }
+    .area-pill {
+      padding: 6px 11px; border-radius: 20px; font-size: 0.78rem; font-weight: 600;
+      border: 1px solid rgba(255,255,255,0.1);
+      background: rgba(255,255,255,0.04); color: var(--text-muted);
+      transition: all 0.15s;
+    }
+    .area-pill:hover { border-color: rgba(255,255,255,0.22); color: var(--text); }
+    .area-pill.sel-mind   { background: rgba(129,140,248,0.2); border-color: #818cf8; color: #c7d2fe; }
+    .area-pill.sel-body   { background: rgba(52,211,153,0.2);  border-color: #34d399; color: #6ee7b7; }
+    .area-pill.sel-skills { background: rgba(251,146,60,0.2);  border-color: #fb923c; color: #fed7aa; }
+    .area-pill.sel-social { background: rgba(232,121,249,0.2); border-color: #e879f9; color: #f5d0fe; }
+    .area-pill.sel-rest   { background: rgba(34,211,238,0.2);  border-color: #22d3ee; color: #a5f3fc; }
+    .area-pill.sel-none   { background: rgba(255,255,255,0.08); border-color: rgba(255,255,255,0.3); color: var(--text); }
+
+    /* Settings area button */
+    .sh-area-btn {
+      width: 18px; height: 18px; border-radius: 50%; border: none;
+      flex-shrink: 0; cursor: pointer; transition: transform 0.15s;
+    }
+    .sh-area-btn:hover { transform: scale(1.25); }
+    .sh-area-unset { background: rgba(255,255,255,0.1); border: 1px dashed rgba(255,255,255,0.25) !important; }
+    .sh-area-set   { border: 2px solid rgba(255,255,255,0.3) !important; }
+
+    /* ═══ Balance bars (Month view) ═══ */
+    #balance-section { margin-top: 18px; }
+    .balance-title {
+      font-size: 0.72rem; font-weight: 700; text-transform: uppercase;
+      letter-spacing: 0.8px; color: var(--text-muted); margin-bottom: 10px;
+    }
+    .balance-row { display: flex; align-items: center; gap: 10px; margin-bottom: 8px; }
+    .balance-area-label { font-size: 0.82rem; color: var(--text); min-width: 78px; }
+    .balance-bar-track { flex: 1; height: 6px; background: rgba(255,255,255,0.07); border-radius: 4px; overflow: hidden; }
+    .balance-bar-fill  { height: 100%; border-radius: 4px; transition: width 0.5s ease; }
+    .balance-pct { font-size: 0.75rem; color: var(--text-muted); min-width: 34px; text-align: right; }
+
+    /* ═══ Milestone Modal ═══ */
+    #modal-milestone { align-items: center; padding: 24px; }
+    .milestone-card {
+      background: var(--surface2); border-radius: 20px;
+      padding: 32px 24px 28px; width: 100%; max-width: 320px; text-align: center;
+    }
+    .milestone-badge { font-size: 3.2rem; margin-bottom: 8px; }
+    .milestone-days  { font-size: 1.25rem; font-weight: 800; color: var(--thrive-accent); margin-bottom: 4px; }
+    .milestone-habit { font-size: 1rem; color: var(--text); margin-bottom: 18px; }
+    .milestone-prompt { font-size: 0.84rem; color: var(--text-muted); margin-bottom: 10px; text-align: left; line-height: 1.5; }
+    #milestone-reflection {
+      width: 100%; min-height: 88px; background: var(--bg);
+      border: 1px solid rgba(255,255,255,0.1); border-radius: 9px;
+      color: var(--text); font-size: 0.88rem; padding: 10px 12px;
+      font-family: var(--font); resize: vertical; margin-bottom: 14px; box-sizing: border-box;
+    }
+    #milestone-reflection:focus { outline: none; border-color: var(--thrive-accent); }
+
     /* ═══ Summary ═══ */
     .btn-summary {
       width: 100%; padding: 12px;
@@ -611,6 +718,15 @@
 
       <!-- TODAY -->
       <div id="view-today" class="view">
+        <div id="mood-checkin">
+          <p>How's your energy today?</p>
+          <div class="mood-btns">
+            <button class="mood-btn" data-mood="low">😴 Low</button>
+            <button class="mood-btn" data-mood="medium">😊 Medium</button>
+            <button class="mood-btn" data-mood="high">⚡ High</button>
+          </div>
+        </div>
+        <div id="pattern-alert" class="hidden"></div>
         <div id="progress-wrap">
           <div id="progress-label">Loading…</div>
           <div id="progress-bar-track">
@@ -647,6 +763,7 @@
         </div>
         <div id="month-grid"></div>
         <div id="month-legend"></div>
+        <div id="balance-section" class="hidden"></div>
         <button class="btn-summary" id="btn-month-summary">📊 Summarize this month</button>
         <div id="month-detail"></div>
       </div>
@@ -673,6 +790,8 @@
       <div id="emoji-grid"></div>
       <input class="modal-input" type="text" id="habit-name-in"
         placeholder="Habit name (e.g. Read 20 mins)" maxlength="40" />
+      <div class="area-picker-label">Life Area</div>
+      <div class="area-pills" id="area-picker"></div>
       <div class="modal-row">
         <button class="btn-primary" id="btn-habit-save">Add Habit</button>
         <button class="btn-ghost" id="btn-habit-cancel">Cancel</button>
@@ -714,6 +833,33 @@
       <div class="modal-row">
         <button class="btn-danger-confirm" id="btn-confirm-delete">Remove</button>
         <button class="btn-ghost" id="btn-cancel-delete">Cancel</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ─── Milestone Modal ─── -->
+  <div id="modal-milestone" class="modal hidden">
+    <div class="milestone-card">
+      <div class="milestone-badge" id="ms-badge">🏅</div>
+      <div class="milestone-days" id="ms-days"></div>
+      <div class="milestone-habit" id="ms-habit"></div>
+      <p class="milestone-prompt">What has this habit changed for you?</p>
+      <textarea id="milestone-reflection" placeholder="Write a short reflection… (optional)"></textarea>
+      <div class="modal-row">
+        <button class="btn-primary" id="btn-ms-save">Save Reflection</button>
+        <button class="btn-ghost" id="btn-ms-skip">Maybe Later</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ─── Area Edit Modal ─── -->
+  <div id="modal-area-edit" class="modal hidden">
+    <div class="modal-card" style="padding:22px 24px 36px">
+      <h3>🏷️ Set Life Area</h3>
+      <div class="area-pills" id="area-edit-picker"></div>
+      <div class="modal-row">
+        <button class="btn-primary" id="btn-area-save">Save</button>
+        <button class="btn-ghost" id="btn-area-cancel">Cancel</button>
       </div>
     </div>
   </div>
@@ -804,6 +950,16 @@
   /* ─── Constants ─── */
   const EMAIL_DOMAIN = '@jaisworld.app';
 
+  const AREAS = [
+    { id: 'mind',   label: '🧠 Mind',    color: '#818cf8' },
+    { id: 'body',   label: '💪 Body',    color: '#34d399' },
+    { id: 'skills', label: '🛠️ Skills',  color: '#fb923c' },
+    { id: 'social', label: '🤝 Social',  color: '#e879f9' },
+    { id: 'rest',   label: '🌿 Rest',    color: '#22d3ee' },
+  ];
+  const MILESTONES = [7, 30, 100];
+  const MS_BADGES  = { 7: '🥉', 30: '🥈', 100: '🥇' };
+
   const EMOJIS = [
     '📖','💪','🧘','🏓','🤖','🎨',
     '💻','🏃','♟️','💧','🎵','🌳',
@@ -846,11 +1002,19 @@
   let todayLogs      = {};
   let weekOffset     = 0;
   let monthOffset    = 0;
-  let cachedMonthLogs = {};
-  let pickedEmoji    = EMOJIS[0];
+  let cachedMonthLogs     = {};
+  let pickedEmoji         = EMOJIS[0];
+  let pickedArea          = '';
   let journalTimer        = null;
   let monthJournalTimer   = null;
   let habitToDelete       = null;
+  let recentLogs          = {};
+  let streaks             = {};
+  let todayMood           = '';
+  let milestoneToShow     = null;
+  let editingAreaHabitId  = null;
+  let editingAreaValue    = '';
+  let alertDismissedUntil = 0;
 
   /* ─── Date Helpers ─── */
   function dStr(d) {
@@ -978,7 +1142,8 @@
     }
     await loadHabits();
 
-    await loadTodayLogs();
+    await Promise.all([loadTodayLogs(), loadRecentLogs()]);
+    computeStreaks();
     await loadJournal();
     renderToday();
     showScreen('app');
@@ -1008,8 +1173,44 @@
   async function loadTodayLogs() {
     try {
       const snap = await db.collection('users').doc(uid).collection('logs').doc(todayStr()).get();
-      todayLogs = snap.exists ? snap.data() : {};
-    } catch (e) { todayLogs = {}; }
+      const data = snap.exists ? snap.data() : {};
+      todayMood = data._mood || '';
+      todayLogs = Object.fromEntries(Object.entries(data).filter(([k]) => !k.startsWith('_')));
+    } catch (e) { todayLogs = {}; todayMood = ''; }
+  }
+
+  async function loadRecentLogs() {
+    const now = new Date();
+    const dates = Array.from({ length: 101 }, (_, i) => {
+      const d = new Date(now);
+      d.setDate(now.getDate() - (i + 1));
+      d.setHours(0, 0, 0, 0);
+      return d;
+    });
+    try {
+      const snaps = await Promise.all(
+        dates.map(d => db.collection('users').doc(uid).collection('logs').doc(dStr(d)).get())
+      );
+      snaps.forEach((s, i) => { recentLogs[dStr(dates[i])] = s.exists ? s.data() : {}; });
+    } catch (e) {}
+  }
+
+  function computeStreaks() {
+    const now = new Date(); now.setHours(0, 0, 0, 0);
+    streaks = {};
+    habits.forEach(h => {
+      let streak = 0;
+      let gapAllowed = !todayLogs[h.id];
+      for (let i = 0; i <= 101; i++) {
+        const d = new Date(now); d.setDate(now.getDate() - i);
+        const ds = dStr(d);
+        const done = i === 0 ? !!todayLogs[h.id] : !!((recentLogs[ds] || {})[h.id]);
+        if (done) { streak++; gapAllowed = false; }
+        else if (i === 0 && gapAllowed) { continue; }
+        else { break; }
+      }
+      streaks[h.id] = streak;
+    });
   }
 
   async function loadJournal() {
@@ -1160,11 +1361,33 @@
       `;
     }
 
+    // Mood insight
+    const moodBuckets = { low: { days: 0, done: 0 }, medium: { days: 0, done: 0 }, high: { days: 0, done: 0 } };
+    pastDates.forEach(d => {
+      const ds  = dStr(d);
+      const dl  = logs[ds] || {};
+      const mood = dl._mood;
+      const doneCt = habits.filter(h => dl[h.id]).length;
+      if (mood && moodBuckets[mood]) { moodBuckets[mood].days++; moodBuckets[mood].done += doneCt; }
+    });
+    const moodLabels = { low: '😴 Low', medium: '😊 Medium', high: '⚡ High' };
+    const moodRows = Object.entries(moodBuckets)
+      .filter(([, v]) => v.days > 0)
+      .map(([k, v]) => {
+        const avg = Math.round(v.done / v.days / total * 100);
+        return `<div class="sum-row"><span class="sum-icon">${moodLabels[k].split(' ')[0]}</span><span>${moodLabels[k]} energy days: avg <strong>${avg}%</strong> completion (${v.days} day${v.days > 1 ? 's' : ''})</span></div>`;
+      });
+    if (moodRows.length > 0) {
+      html += `<div class="sum-section-label" style="margin-top:16px">⚡ Energy Patterns</div>${moodRows.join('')}`;
+    }
+
     $('summary-body').innerHTML = html;
   }
 
   /* ─── Today View ─── */
   function renderToday() {
+    renderMoodPicker();
+    renderPatternAlert();
     const done  = habits.filter(h => todayLogs[h.id]).length;
     const total = habits.length;
     const pct   = total ? Math.round((done / total) * 100) : 0;
@@ -1181,14 +1404,17 @@
       return;
     }
 
-    $('habit-list').innerHTML = habits.map(h => `
-      <div class="habit-item ${todayLogs[h.id] ? 'done' : ''}"
-           id="hi-${h.id}" data-id="${h.id}">
-        <span class="habit-emoji">${h.emoji}</span>
-        <span class="habit-name">${h.name}</span>
-        <span class="habit-check">${todayLogs[h.id] ? '✓' : ''}</span>
-      </div>
-    `).join('');
+    $('habit-list').innerHTML = habits.map(h => {
+      const streak = streaks[h.id] || 0;
+      return `
+        <div class="habit-item ${todayLogs[h.id] ? 'done' : ''}" id="hi-${h.id}" data-id="${h.id}">
+          ${h.area ? `<span class="area-dot area-${h.area}"></span>` : ''}
+          <span class="habit-emoji">${h.emoji}</span>
+          <span class="habit-name">${h.name}</span>
+          ${streak >= 2 ? `<span class="habit-streak">🔥 ${streak}</span>` : ''}
+          <span class="habit-check">${todayLogs[h.id] ? '✓' : ''}</span>
+        </div>`;
+    }).join('');
 
     document.querySelectorAll('.habit-item').forEach(el => {
       el.addEventListener('click', () => toggleHabit(el.dataset.id));
@@ -1196,7 +1422,8 @@
   }
 
   async function toggleHabit(habitId) {
-    const el = document.getElementById(`hi-${habitId}`);
+    const el   = document.getElementById(`hi-${habitId}`);
+    const wasOff = !todayLogs[habitId];
     if (todayLogs[habitId]) {
       delete todayLogs[habitId];
     } else {
@@ -1204,11 +1431,29 @@
       el && el.classList.add('pop');
       setTimeout(() => el && el.classList.remove('pop'), 350);
     }
+    computeStreaks();
     renderToday();
     try {
-      const ref = db.collection('users').doc(uid).collection('logs').doc(todayStr());
-      await ref.set(todayLogs);
+      const writeData = { ...todayLogs };
+      if (todayMood) writeData._mood = todayMood;
+      await db.collection('users').doc(uid).collection('logs').doc(todayStr()).set(writeData);
     } catch (e) {}
+
+    if (wasOff) {
+      const streak = streaks[habitId] || 0;
+      for (const ms of MILESTONES) {
+        if (streak === ms) {
+          const habit = habits.find(h => h.id === habitId);
+          if (habit && !habit[`ms${ms}`]) {
+            habit[`ms${ms}`] = true;
+            db.collection('users').doc(uid).collection('habits').doc(habitId)
+              .update({ [`ms${ms}`]: true }).catch(() => {});
+            showMilestoneModal(habit, ms);
+          }
+          break;
+        }
+      }
+    }
   }
 
   /* Journal auto-save */
@@ -1318,6 +1563,7 @@
     $('month-grid').innerHTML   = html;
     $('month-label').textContent = fmtMonth(info.year, info.month);
     $('btn-month-next').disabled = monthOffset >= 0;
+    renderBalance();
 
     $('month-legend').innerHTML = [0, 0.25, 0.5, 0.75, 1].map(p => {
       const bg = p === 0 ? 'rgba(255,255,255,0.04)' : `rgba(16,185,129,${(0.2 + p * 0.8).toFixed(2)})`;
@@ -1404,6 +1650,154 @@
     panel.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
   }
 
+  /* ─── Mood ─── */
+  function renderMoodPicker() {
+    document.querySelectorAll('.mood-btn').forEach(btn => {
+      btn.classList.remove('sel-low', 'sel-medium', 'sel-high');
+      if (btn.dataset.mood === todayMood) btn.classList.add(`sel-${todayMood}`);
+    });
+  }
+
+  async function saveMood(mood) {
+    todayMood = mood === todayMood ? '' : mood;
+    renderMoodPicker();
+    try {
+      const writeData = { ...todayLogs };
+      if (todayMood) writeData._mood = todayMood;
+      await db.collection('users').doc(uid).collection('logs').doc(todayStr()).set(writeData);
+    } catch(e) {}
+  }
+
+  /* ─── Pattern Alerts ─── */
+  function renderPatternAlert() {
+    if (Date.now() < alertDismissedUntil) { hd('pattern-alert'); return; }
+    const now = new Date(); now.setHours(0, 0, 0, 0);
+    const alerts = [];
+    habits.forEach(h => {
+      let missed = 0;
+      for (let i = 1; i <= 7; i++) {
+        const d = new Date(now); d.setDate(now.getDate() - i);
+        if (!((recentLogs[dStr(d)] || {})[h.id])) missed++;
+        else break;
+      }
+      if (missed >= 3) alerts.push({ habit: h, missed });
+    });
+    const el = $('pattern-alert');
+    if (!alerts.length) { hd('pattern-alert'); return; }
+    el.innerHTML = `
+      <div class="alert-header">
+        <span class="alert-title">💛 Heads up</span>
+        <button class="alert-dismiss" id="btn-alert-dismiss">✕</button>
+      </div>
+      ${alerts.map(a =>
+        `<div class="alert-item">• ${a.habit.emoji} ${a.habit.name} — ${a.missed} day${a.missed > 1 ? 's' : ''} missed</div>`
+      ).join('')}
+    `;
+    el.classList.remove('hidden');
+    $('btn-alert-dismiss').onclick = () => {
+      alertDismissedUntil = Date.now() + 86400000;
+      hd('pattern-alert');
+    };
+  }
+
+  /* ─── Milestone Modal ─── */
+  function showMilestoneModal(habit, days) {
+    $('ms-badge').textContent  = MS_BADGES[days] || '🏅';
+    $('ms-days').textContent   = `${days}-Day Milestone!`;
+    $('ms-habit').textContent  = `${habit.emoji} ${habit.name}`;
+    $('milestone-reflection').value = '';
+    milestoneToShow = { habit, days };
+    sh('modal-milestone');
+  }
+
+  async function saveMilestoneReflection() {
+    if (!milestoneToShow) return;
+    const text = $('milestone-reflection').value.trim();
+    if (text) {
+      try {
+        await db.collection('users').doc(uid).collection('milestones')
+          .doc(`${milestoneToShow.habit.id}_${milestoneToShow.days}`).set({
+            text, habitId: milestoneToShow.habit.id, habitName: milestoneToShow.habit.name,
+            days: milestoneToShow.days, achievedAt: todayStr()
+          });
+      } catch(e) {}
+    }
+    hd('modal-milestone');
+    milestoneToShow = null;
+  }
+
+  /* ─── Life Area Balance ─── */
+  function renderBalance() {
+    const section  = $('balance-section');
+    const todayS   = todayStr();
+    const areaList = AREAS.filter(a => habits.some(h => h.area === a.id));
+    if (!areaList.length) { section.classList.add('hidden'); return; }
+
+    const pastKeys = Object.keys(cachedMonthLogs).filter(ds => ds <= todayS);
+    let html = '<div class="balance-title">⚖️ Life Area Balance</div>';
+    areaList.forEach(area => {
+      const aHabits = habits.filter(h => h.area === area.id);
+      let done = 0, total = 0;
+      pastKeys.forEach(ds => {
+        const dl = cachedMonthLogs[ds] || {};
+        aHabits.forEach(h => { total++; if (dl[h.id]) done++; });
+      });
+      const pct = total ? Math.round(done / total * 100) : 0;
+      html += `<div class="balance-row">
+        <div class="balance-area-label">${area.label}</div>
+        <div class="balance-bar-track"><div class="balance-bar-fill" style="width:${pct}%;background:${area.color}"></div></div>
+        <div class="balance-pct">${pct}%</div>
+      </div>`;
+    });
+    section.innerHTML = html;
+    section.classList.remove('hidden');
+  }
+
+  /* ─── Area Picker (Add Habit modal) ─── */
+  function buildAreaPicker() {
+    const none = `<button class="area-pill ${!pickedArea ? 'sel-none' : ''}" data-area="">None</button>`;
+    $('area-picker').innerHTML = AREAS.map(a =>
+      `<button class="area-pill ${pickedArea === a.id ? `sel-${a.id}` : ''}" data-area="${a.id}">${a.label}</button>`
+    ).join('') + none;
+    document.querySelectorAll('#area-picker .area-pill').forEach(btn => {
+      btn.addEventListener('click', () => { pickedArea = btn.dataset.area; buildAreaPicker(); });
+    });
+  }
+
+  /* ─── Area Edit (Settings) ─── */
+  function openAreaEdit(habitId) {
+    editingAreaHabitId = habitId;
+    editingAreaValue   = habits.find(h => h.id === habitId)?.area || '';
+    renderAreaEditPicker();
+    sh('modal-area-edit');
+  }
+
+  function renderAreaEditPicker() {
+    const none = `<button class="area-pill ${!editingAreaValue ? 'sel-none' : ''}" data-area="">None</button>`;
+    $('area-edit-picker').innerHTML = AREAS.map(a =>
+      `<button class="area-pill ${editingAreaValue === a.id ? `sel-${a.id}` : ''}" data-area="${a.id}">${a.label}</button>`
+    ).join('') + none;
+    document.querySelectorAll('#area-edit-picker .area-pill').forEach(btn => {
+      btn.addEventListener('click', () => { editingAreaValue = btn.dataset.area; renderAreaEditPicker(); });
+    });
+  }
+
+  async function saveHabitArea() {
+    if (!editingAreaHabitId) return;
+    const habit = habits.find(h => h.id === editingAreaHabitId);
+    if (habit) {
+      habit.area = editingAreaValue || null;
+      try {
+        const update = editingAreaValue ? { area: editingAreaValue } : { area: firebase.firestore.FieldValue.delete() };
+        await db.collection('users').doc(uid).collection('habits').doc(editingAreaHabitId).update(update);
+      } catch(e) {}
+    }
+    hd('modal-area-edit');
+    editingAreaHabitId = null;
+    renderSettingsHabits();
+    renderToday();
+  }
+
   /* ─── Add Habit ─── */
   function buildEmojiGrid() {
     $('emoji-grid').innerHTML = EMOJIS.map(e =>
@@ -1418,6 +1812,7 @@
         buildEmojiGrid();
       });
     });
+    buildAreaPicker();
   }
 
   async function addHabit() {
@@ -1426,10 +1821,12 @@
     const maxOrder = habits.length ? Math.max(...habits.map(h => h.order)) : -1;
     const id = 'c_' + Date.now();
     const data = { name, emoji: pickedEmoji, order: maxOrder + 1, active: true };
+    if (pickedArea) data.area = pickedArea;
     try {
       await db.collection('users').doc(uid).collection('habits').doc(id).set(data);
       habits.push({ id, ...data });
       $('habit-name-in').value = '';
+      pickedArea = '';
       hd('modal-habit');
       renderSettingsHabits();
       renderToday();
@@ -1447,9 +1844,14 @@
       <div class="sh-item">
         <span class="sh-emoji">${h.emoji}</span>
         <span class="sh-name">${h.name}</span>
+        <button class="sh-area-btn ${h.area ? `sh-area-set area-${h.area}` : 'sh-area-unset'}"
+          data-areaid="${h.id}" title="Set life area"></button>
         <button class="sh-del" data-del="${h.id}" data-name="${h.name}" title="Remove">🗑</button>
       </div>
     `).join('');
+    document.querySelectorAll('.sh-area-btn').forEach(btn => {
+      btn.addEventListener('click', () => openAreaEdit(btn.dataset.areaid));
+    });
     document.querySelectorAll('.sh-del').forEach(btn => {
       btn.addEventListener('click', () => {
         habitToDelete = { id: btn.dataset.del, name: btn.dataset.name };
@@ -1501,6 +1903,25 @@
   }
 
   /* ─── Event Listeners ─── */
+  // Mood picker
+  document.querySelectorAll('.mood-btn').forEach(btn => {
+    btn.addEventListener('click', () => { if (uid) saveMood(btn.dataset.mood); });
+  });
+
+  // Milestone modal
+  $('btn-ms-save').onclick = saveMilestoneReflection;
+  $('btn-ms-skip').onclick = () => { hd('modal-milestone'); milestoneToShow = null; };
+  $('modal-milestone').addEventListener('click', function(e) {
+    if (e.target === this) { hd('modal-milestone'); milestoneToShow = null; }
+  });
+
+  // Area edit modal
+  $('btn-area-save').onclick   = saveHabitArea;
+  $('btn-area-cancel').onclick = () => { hd('modal-area-edit'); editingAreaHabitId = null; };
+  $('modal-area-edit').addEventListener('click', function(e) {
+    if (e.target === this) { hd('modal-area-edit'); editingAreaHabitId = null; }
+  });
+
   // Auth
   $('btn-login').onclick  = doLogin;
   $('btn-signup').onclick = doSignup;
@@ -1575,7 +1996,7 @@
   $('btn-cancel-delete').onclick  = () => { hd('modal-delete'); habitToDelete = null; };
 
   // Close modals by clicking backdrop
-  ['modal-habit', 'modal-settings', 'modal-delete'].forEach(id => {
+  ['modal-habit', 'modal-settings', 'modal-delete', 'modal-summary', 'modal-journal-tips'].forEach(id => {
     $(id).addEventListener('click', function(e) {
       if (e.target === this) { this.classList.add('hidden'); habitToDelete = null; }
     });

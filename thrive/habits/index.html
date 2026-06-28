@@ -205,7 +205,38 @@
       background: var(--surface); border-radius: 12px;
       border: 1px solid rgba(255,255,255,0.05); padding: 18px;
     }
-    #journal-section h3 { font-size: 0.97rem; margin-bottom: 12px; color: var(--text); }
+    #journal-section h3 {
+      font-size: 0.97rem; margin-bottom: 12px; color: var(--text);
+      display: flex; align-items: center; gap: 8px;
+    }
+    #btn-journal-tips {
+      display: inline-flex; align-items: center; justify-content: center;
+      width: 20px; height: 20px; border-radius: 50%;
+      background: rgba(16,185,129,0.15);
+      border: 1px solid rgba(16,185,129,0.35);
+      color: var(--thrive-accent); font-size: 0.72rem; font-weight: 700;
+      font-style: italic; font-family: Georgia, serif;
+      line-height: 1; flex-shrink: 0;
+      transition: background 0.2s, border-color 0.2s;
+    }
+    #btn-journal-tips:hover { background: rgba(16,185,129,0.28); border-color: var(--thrive-accent); }
+
+    /* Journal tips modal */
+    .tips-card { padding: 28px 24px 40px; }
+    .tips-card h3 { font-size: 1.05rem; margin-bottom: 6px; }
+    .tips-subtitle { font-size: 0.82rem; color: var(--text-muted); margin-bottom: 20px; line-height: 1.5; }
+    .tip-item {
+      display: flex; gap: 12px; align-items: flex-start;
+      padding: 12px 14px; border-radius: 10px;
+      background: rgba(255,255,255,0.03);
+      border: 1px solid rgba(255,255,255,0.05);
+      margin-bottom: 8px;
+    }
+    .tip-icon { font-size: 1.2rem; flex-shrink: 0; margin-top: 1px; }
+    .tip-body {}
+    .tip-label { font-size: 0.88rem; font-weight: 700; color: var(--thrive-accent); margin-bottom: 2px; }
+    .tip-prompt { font-size: 0.82rem; color: var(--text-muted); line-height: 1.5; }
+
     #journal-text {
       width: 100%; min-height: 130px;
       background: var(--bg);
@@ -545,7 +576,7 @@
         </div>
         <div id="habit-list"></div>
         <div id="journal-section">
-          <h3>📝 Today's Journal</h3>
+          <h3>📝 Today's Journal <button id="btn-journal-tips" title="Journaling tips">i</button></h3>
           <textarea id="journal-text" placeholder="How was your day? What's on your mind?"></textarea>
           <div id="journal-saved" class="hidden">Saved ✓</div>
         </div>
@@ -639,6 +670,60 @@
         <button class="btn-danger-confirm" id="btn-confirm-delete">Remove</button>
         <button class="btn-ghost" id="btn-cancel-delete">Cancel</button>
       </div>
+    </div>
+  </div>
+
+  <!-- ─── Journal Tips Modal ─── -->
+  <div id="modal-journal-tips" class="modal hidden">
+    <div class="modal-card tips-card">
+      <h3>✍️ Journal Best Practices</h3>
+      <p class="tips-subtitle">Use these prompts to go deeper and build real self-awareness over time.</p>
+
+      <div class="tip-item">
+        <span class="tip-icon">🏆</span>
+        <div class="tip-body">
+          <div class="tip-label">Celebrate Wins</div>
+          <div class="tip-prompt">What went well today — big or small? Give yourself credit.</div>
+        </div>
+      </div>
+      <div class="tip-item">
+        <span class="tip-icon">💪</span>
+        <div class="tip-body">
+          <div class="tip-label">Acknowledge Challenges</div>
+          <div class="tip-prompt">What was hard? What would you do differently next time?</div>
+        </div>
+      </div>
+      <div class="tip-item">
+        <span class="tip-icon">🙏</span>
+        <div class="tip-body">
+          <div class="tip-label">Gratitude</div>
+          <div class="tip-prompt">Name 1–3 things you're genuinely grateful for today.</div>
+        </div>
+      </div>
+      <div class="tip-item">
+        <span class="tip-icon">🧠</span>
+        <div class="tip-body">
+          <div class="tip-label">Key Insight</div>
+          <div class="tip-prompt">What's one thing you learned or noticed about yourself today?</div>
+        </div>
+      </div>
+      <div class="tip-item">
+        <span class="tip-icon">💙</span>
+        <div class="tip-body">
+          <div class="tip-label">Emotional Check-In</div>
+          <div class="tip-prompt">How are you feeling right now, and what's behind that feeling?</div>
+        </div>
+      </div>
+      <div class="tip-item">
+        <span class="tip-icon">🎯</span>
+        <div class="tip-body">
+          <div class="tip-label">Tomorrow's Intention</div>
+          <div class="tip-prompt">What's one thing you want to focus on or do better tomorrow?</div>
+        </div>
+      </div>
+
+      <div style="height:16px"></div>
+      <button class="btn-ghost" id="btn-tips-close" style="width:100%">Got it</button>
     </div>
   </div>
 
@@ -1264,6 +1349,13 @@
   $('btn-habit-save').onclick  = addHabit;
   $('btn-habit-cancel').onclick = () => hd('modal-habit');
   $('habit-name-in').addEventListener('keydown', e => { if (e.key === 'Enter') addHabit(); });
+
+  // Journal tips
+  $('btn-journal-tips').onclick = () => sh('modal-journal-tips');
+  $('btn-tips-close').onclick   = () => hd('modal-journal-tips');
+  $('modal-journal-tips').addEventListener('click', function(e) {
+    if (e.target === this) hd('modal-journal-tips');
+  });
 
   // Settings modal
   $('btn-settings-open').onclick  = () => { renderSettingsHabits(); sh('modal-settings'); };
